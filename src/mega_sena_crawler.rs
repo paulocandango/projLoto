@@ -50,15 +50,10 @@ pub async fn executar() {
         println!("Resultado não encontrado.");
     }
 
-    // Recuperando os NÚMEROS sorteados
-    let numero_selector = Selector::parse("div.item-powerball").unwrap();
-
+    // Recuperando os ELEMENTOS sorteados
+    let numero_selector = Selector::parse("ul#ulDezenas li").unwrap();
     for element in document.select(&numero_selector) {
-        // Captura apenas o texto dos elementos, sem HTML
-        let numero_texto = element.text().collect::<String>().trim().to_string();
-
-        // Imprime cada número sorteado
-        println!("{}", numero_texto);
+        println!("{}", element.inner_html());
     }
 
     // Fecha o driver
