@@ -9,7 +9,7 @@ use scraper::{Html, Selector}; // Importa o scraper
 
 pub async fn executar() {
 
-    println!("[CRAWLER] --- CAIXA ECONOMICA FEDERAL - MEGASENA ---");
+    println!("[CRAWLER] --- POWER BALL - POWER BALL ---");
 
     // Inicia o geckodriver como um subprocesso
     let mut geckodriver = Command::new("resource/geckodriver.exe")
@@ -26,7 +26,7 @@ pub async fn executar() {
     let driver = WebDriver::new("http://127.0.0.1:4444", caps).await.unwrap();
 
     // Abre a página da Mega-Sena
-    driver.get("http://loterias.caixa.gov.br/Paginas/Mega-Sena.aspx").await.unwrap();
+    driver.get("http://www.powerball.com/draw-result").await.unwrap();
 
     // Espera um pouco para garantir que a página carregue completamente
     sleep(Duration::from_secs(10)).await; // Espera 10 segundos
@@ -38,28 +38,30 @@ pub async fn executar() {
     let document = Html::parse_document(&html);
 
     // Identificando o Crawler
-    println!("--- CAIXA ECONOMICA FEDERAL - MEGASENA - Identificando o concurso e os números sorteados ---");
+    println!("--- POWER BALL - POWER BALL - Identificando o concurso e os números sorteados ---");
 
     // Recuperando o ID do concurso
-    let concurso_selector = Selector::parse("h2 > span.ng-binding").unwrap();
+    let concurso_selector = Selector::parse("h5.title-date").unwrap();
     if let Some(resultado) = document.select(&concurso_selector).next() {
         // Captura o texto do concurso
-        let concurso_texto = resultado.inner_html(); // ou use resultado.text() para pegar apenas o texto sem HTML
-        println!("{}", concurso_texto);
+        let concurso_texto = resultado.text().collect::<String>(); // Coleta apenas o texto
+        println!("Data do concurso: {}", concurso_texto);
     } else {
         println!("Resultado não encontrado.");
     }
 
     // Recuperando os NÚMEROS sorteados
     let numero_selector = Selector::parse("div.item-powerball").unwrap();
+    let mut numeros_sorteados = Vec::new(); // Para armazenar os números
 
     for element in document.select(&numero_selector) {
         // Captura apenas o texto dos elementos, sem HTML
         let numero_texto = element.text().collect::<String>().trim().to_string();
-
-        // Imprime cada número sorteado
-        println!("{}", numero_texto);
+        numeros_sorteados.push(numero_texto); // Adiciona o número ao vetor
     }
+
+    // Imprime os números sorteados
+    println!("Números sorteados: {}", numeros_sorteados.join(" "));
 
     // Fecha o driver
     driver.quit().await.unwrap();

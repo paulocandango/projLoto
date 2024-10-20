@@ -1,12 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saudação</title>
+    <title>LotteryBTC</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<h1>Olá, {{ nome_pessoa }}!</h1>
+<header>
+    <h1>LotteryBTC</h1>
+</header>
+<main>
+    <div class="form-container">
+        <label for="lottery-select">Escolha a Loteria:</label>
+        <select id="lottery-select">
+            <option value="powerball">PowerBall</option>
+            <option value="megasena">Mega Sena</option>
+            <option value="lotofacil">Lotofácil</option>
+        </select>
+
+        <div id="number-balls" class="ball-container">
+            <!-- As bolas serão inseridas aqui via JavaScript -->
+        </div>
+
+        <label for="wallet">Carteira Bitcoin:</label>
+        <input type="text" id="wallet" placeholder="Digite sua carteira Bitcoin">
+
+        <button id="submit-button">Apostar</button>
+        <div id="selected-numbers"></div>
+    </div>
+</main>
+
+<script src="script.js"></script>
 </body>
 </html>

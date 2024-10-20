@@ -1,5 +1,6 @@
 mod mega_sena_crawler;
 mod loto_facil_crawler;
+mod power_ball_crawler;
 
 use tokio::time::{self, Duration};
 use actix_web::{web, App, HttpServer, Responder};
@@ -11,7 +12,7 @@ async fn main() {
     println!("--- INICIANDO A EXECUÇÃO DA MAIN ----");
 
     // 2. Agenda a execução da função `update_crawlers` a cada 5 segundos
-    let mut intervalo = time::interval(Duration::from_secs(5*60));
+    let mut intervalo = time::interval(Duration::from_secs(10*60));
 
     // 3. Iniciar o servidor HTTP antes do loop
     println!("--- INICIANDO SERVIDOR HTTP ---");
@@ -64,6 +65,7 @@ async fn teste_controller(tmpl: web::Data<Tera>) -> impl Responder {
 // Função que imprime um log quando é executada
 async fn update_crawlers() {
     println!("--- Executando update_crawlers ----");
-    mega_sena_crawler::executar().await;
-    loto_facil_crawler::executar().await; // Chama a função executar
+    //mega_sena_crawler::executar().await;
+    //loto_facil_crawler::executar().await;
+    //power_ball_crawler::executar().await;
 }
