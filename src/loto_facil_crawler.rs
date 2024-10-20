@@ -1,4 +1,4 @@
-// src/mega_sena_crawler.rs
+// src/loto_facil_crawler.rs
 
 use std::process::Command;
 use std::time::Duration;
@@ -9,7 +9,7 @@ use scraper::{Html, Selector}; // Importa o scraper
 
 pub async fn executar() {
 
-    println!("[CRAWLER] --- CAIXA ECONOMICA FEDERAL - MEGASENA ---");
+    println!("[CRAWLER] --- CAIXA ECONOMICA FEDERAL - LOTOFACIL ---");
 
     // Inicia o geckodriver como um subprocesso
     let mut geckodriver = Command::new("resource/geckodriver.exe")
@@ -25,8 +25,8 @@ pub async fn executar() {
     // Configura o driver do Firefox
     let driver = WebDriver::new("http://127.0.0.1:4444", caps).await.unwrap();
 
-    // Abre a página da Mega-Sena
-    driver.get("http://loterias.caixa.gov.br/Paginas/Mega-Sena.aspx").await.unwrap();
+    // Abre a página da Loto-Facil
+    driver.get("http://loterias.caixa.gov.br/Paginas/Lotofacil.aspx").await.unwrap();
 
     // Espera um pouco para garantir que a página carregue completamente
     sleep(Duration::from_secs(10)).await; // Espera 10 segundos
@@ -38,7 +38,7 @@ pub async fn executar() {
     let document = Html::parse_document(&html);
 
     // Identificando o Crawler
-    println!("--- CAIXA ECONOMICA FEDERAL - MEGASENA - Identificando o concurso e os números sorteados ---");
+    println!("--- CAIXA ECONOMICA FEDERAL - LOTOFACIL - Identificando o concurso e os números sorteados ---");
 
     // Recuperando o ID do concurso
     let concurso_selector = Selector::parse("h2 > span.ng-binding").unwrap();
@@ -51,7 +51,7 @@ pub async fn executar() {
     }
 
     // Recuperando os ELEMENTOS sorteados
-    let numero_selector = Selector::parse("ul#ulDezenas li").unwrap();
+    let numero_selector = Selector::parse("ul.lotofacil li").unwrap();
     for element in document.select(&numero_selector) {
         println!("{}", element.inner_html());
     }
