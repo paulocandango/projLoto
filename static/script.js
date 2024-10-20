@@ -42,6 +42,10 @@ lotterySelect.addEventListener('change', () => {
     } else if (value === 'powerball') {
         generateBalls(69);
     }
+
+    // Zera os numeros escolhidos
+    selectedNumbers = [];
+    selectedNumbersDiv.innerText = "";
 });
 
 // Inicializa com Powerball

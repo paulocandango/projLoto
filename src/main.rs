@@ -5,6 +5,7 @@ mod power_ball_crawler;
 use tokio::time::{self, Duration};
 use actix_web::{web, App, HttpServer, Responder};
 use tera::{Tera, Context};
+use actix_files as fs; // Para servir arquivos estáticos
 
 #[actix_web::main]
 async fn main() {
@@ -41,6 +42,7 @@ async fn start_server() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(tera.clone()) // Compartilha o Tera com o App
+            .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
             .route("/teste", web::get().to(teste_controller)) // Define a rota
     })
         .bind("127.0.0.1:8080")?
