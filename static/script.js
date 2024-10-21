@@ -1,6 +1,9 @@
 const lotterySelect = document.getElementById('lottery-select');
 const numberBallsContainer = document.getElementById('number-balls');
 const selectedNumbersDiv = document.getElementById('selected-numbers');
+const wallet = document.getElementById('wallet');
+const submitbutton = document.getElementById('submit-button');
+
 let selectedNumbers = [];
 
 // Gera as bolas
@@ -35,12 +38,16 @@ function updateSelectedNumbers() {
 // Habilita bolas conforme a seleção da loteria
 lotterySelect.addEventListener('change', () => {
     const value = lotterySelect.value;
-    if (value === 'megasena') {
+    if(value === ''){
+        generateBalls(0);
+    } else if (value === 'megasena') {
         generateBalls(60);
     } else if (value === 'lotofacil') {
         generateBalls(25);
     } else if (value === 'powerball') {
         generateBalls(69);
+    } else if (value === 'chinawelfare') {
+        generateBalls(33);
     }
 
     // Zera os numeros escolhidos
@@ -49,4 +56,37 @@ lotterySelect.addEventListener('change', () => {
 });
 
 // Inicializa com Powerball
-generateBalls(69);
+generateBalls(0);
+
+//----------------- REGRAS DE VALIDAÇÃO DOS TIPOS DE LOTERIAS ------------------------------------
+// Adiciona verificação ao clicar no botão de submit
+submitbutton.addEventListener('click', function(event) {
+
+    const selectedLottery = lotterySelect.value;
+
+    if(!isSelectionValid(selectedNumbers.length)){
+        alert('Escolha os numeros de acordo com as quantidades apropriadas para o seu sorteio!');
+        event.preventDefault();  // Cancela o envio do formulário
+        return;
+    }
+
+});
+
+function isSelectionValid(newLength) {
+
+    const value = lotterySelect.value;
+
+    if (value === 'megasena') {
+        return newLength >= 6 && newLength <= 15;
+    } else if (value === 'lotofacil') {
+        return newLength >= 15 && newLength <= 20;
+    } else if (value === 'powerball') {
+        return newLength === 6;
+    } else if (value === 'chinawelfare') {
+        return newLength === 7;
+    } else if (value === '') {
+        return false;
+    }
+
+    return true;
+}

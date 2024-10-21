@@ -1,6 +1,7 @@
 mod mega_sena_crawler;
 mod loto_facil_crawler;
 mod power_ball_crawler;
+mod china_welfare_crawler;
 
 use tokio::time::{self, Duration};
 use actix_web::{web, App, HttpServer, Responder};
@@ -67,7 +68,8 @@ async fn teste_controller(tmpl: web::Data<Tera>) -> impl Responder {
 // Função que imprime um log quando é executada
 async fn update_crawlers() {
     println!("--- Executando update_crawlers ----");
-    mega_sena_crawler::executar().await;
-    loto_facil_crawler::executar().await;
+    //mega_sena_crawler::executar().await;
+    //loto_facil_crawler::executar().await;
     //power_ball_crawler::executar().await;
+    //china_welfare_crawler::executar().await;
 }

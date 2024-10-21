@@ -4,19 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LotteryBTC</title>
-    <link rel="stylesheet" href="/static//styles.css">
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-<header>
+<header class="form-container">
     <h1>LotteryBTC</h1>
 </header>
+<div>
+    &nbsp;
+</div>
 <main>
     <div class="form-container">
         <label for="lottery-select">Escolha a Loteria:</label>
         <select id="lottery-select">
-            <option value="powerball">PowerBall</option>
-            <option value="megasena">Mega Sena</option>
-            <option value="lotofacil">Lotofácil</option>
+            <option value="">--- ESCOLHA QUALQUER LOTERIA DO MUNDO INTEIRO! ---</option>
+            <option value="megasena">Brasil - Mega Sena</option>
+            <option value="lotofacil">Brasil - Loto Facil</option>
+            <option value="powerball">United States - Power Ball</option>
+            <option value="chinawelfare">China - WelFare Lottery</option>
         </select>
 
         <div id="number-balls" class="ball-container">
