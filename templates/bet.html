@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LotteryBTC</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="form-container">
+    <h1>LotteryBTC</h1>
+</header>
+<div>
+    &nbsp;
+</div>
+<main>
+    <div class="form-container">
+        <label for="lottery-select">Escolha a Loteria:</label>
+        <select id="lottery-select">
+            <option value="">--- ESCOLHA QUALQUER LOTERIA DO MUNDO INTEIRO! ---</option>
+            <option value="megasena">Brasil - Mega Sena</option>
+            <option value="lotofacil">Brasil - Loto Facil</option>
+            <option value="powerball">United States - Power Ball</option>
+            <option value="chinawelfare">China - WelFare Lottery</option>
+        </select>
+
+        <div id="number-balls" class="ball-container">
+            <!-- As bolas serão inseridas aqui via JavaScript -->
+        </div>
+
+        <label for="wallet">Carteira Bitcoin:</label>
+        <textarea id="wallet" placeholder="Digite sua carteira Bitcoin"></textarea>
+
+        <!--<input type="text" id="wallet" placeholder="Digite sua carteira Bitcoin">-->
+
+        <button id="submit-button">Apostar</button>
+        <div id="selected-numbers"></div>
+    </div>
+</main>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

@@ -34,6 +34,15 @@ async fn main() {
 
 }
 
+// Função que imprime um log quando é executada
+async fn update_crawlers() {
+    println!("--- Executando update_crawlers ----");
+    //mega_sena_crawler::executar().await;
+    //loto_facil_crawler::executar().await;
+    //power_ball_crawler::executar().await;
+    //china_welfare_crawler::executar().await;
+}
+
 // Função para inicializar o servidor HTTP
 async fn start_server() -> std::io::Result<()> {
     // Cria uma instância de Tera para carregar os templates
@@ -44,15 +53,18 @@ async fn start_server() -> std::io::Result<()> {
         App::new()
             .data(tera.clone()) // Compartilha o Tera com o App
             .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
-            .route("/teste", web::get().to(teste_controller)) // Define a rota
+            .route("/", web::get().to(index))
+            .route("/bet", web::get().to(bet))
+            .route("/setup", web::get().to(setup))
     })
         .bind("127.0.0.1:8080")?
         .run()
         .await
 }
 
-// Controller para a rota /teste
-async fn teste_controller(tmpl: web::Data<Tera>) -> impl Responder {
+
+// Controller para a rota /bet
+async fn index(tmpl: web::Data<Tera>) -> impl Responder {
     let mut context = Context::new();
     let nome_pessoa = "Paulo".to_string(); // Define a variável com o nome
     context.insert("nome_pessoa", &nome_pessoa); // Insere a variável no contexto
@@ -65,11 +77,31 @@ async fn teste_controller(tmpl: web::Data<Tera>) -> impl Responder {
         .body(rendered) // Adiciona o corpo da resposta
 }
 
-// Função que imprime um log quando é executada
-async fn update_crawlers() {
-    println!("--- Executando update_crawlers ----");
-    //mega_sena_crawler::executar().await;
-    //loto_facil_crawler::executar().await;
-    //power_ball_crawler::executar().await;
-    //china_welfare_crawler::executar().await;
+// Controller para a rota /bet
+async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
+    let mut context = Context::new();
+    let nome_pessoa = "Paulo".to_string(); // Define a variável com o nome
+    context.insert("nome_pessoa", &nome_pessoa); // Insere a variável no contexto
+
+    // Renderiza o template usando Tera
+    let rendered = tmpl.render("bet.html", &context).unwrap();
+    // Retorna o HTML renderizado como resposta com o cabeçalho correto
+    actix_web::HttpResponse::Ok()
+        .content_type("text/html") // Define o tipo de conteúdo como HTML
+        .body(rendered) // Adiciona o corpo da resposta
+}
+
+
+// Controller para a rota /bet
+async fn setup(tmpl: web::Data<Tera>) -> impl Responder {
+    let mut context = Context::new();
+    let nome_pessoa = "Paulo".to_string(); // Define a variável com o nome
+    context.insert("nome_pessoa", &nome_pessoa); // Insere a variável no contexto
+
+    // Renderiza o template usando Tera
+    let rendered = tmpl.render("setup.html", &context).unwrap();
+    // Retorna o HTML renderizado como resposta com o cabeçalho correto
+    actix_web::HttpResponse::Ok()
+        .content_type("text/html") // Define o tipo de conteúdo como HTML
+        .body(rendered) // Adiciona o corpo da resposta
 }

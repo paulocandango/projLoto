@@ -1,43 +1,71 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LotteryBTC</title>
+    <title>LotteryBTC - Apostas com Bitcoin</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-<header class="form-container">
-    <h1>LotteryBTC</h1>
+<!-- Banner -->
+<header class="banner white-box">
+    <h1>Lottery BTC</h1>
 </header>
-<div>
-    &nbsp;
-</div>
+
+<!-- Corpo da página -->
 <main>
-    <div class="form-container">
-        <label for="lottery-select">Escolha a Loteria:</label>
-        <select id="lottery-select">
-            <option value="">--- ESCOLHA QUALQUER LOTERIA DO MUNDO INTEIRO! ---</option>
-            <option value="megasena">Brasil - Mega Sena</option>
-            <option value="lotofacil">Brasil - Loto Facil</option>
-            <option value="powerball">United States - Power Ball</option>
-            <option value="chinawelfare">China - WelFare Lottery</option>
-        </select>
-
-        <div id="number-balls" class="ball-container">
-            <!-- As bolas serão inseridas aqui via JavaScript -->
-        </div>
-
-        <label for="wallet">Carteira Bitcoin:</label>
-        <textarea id="wallet" placeholder="Digite sua carteira Bitcoin"></textarea>
-
-        <!--<input type="text" id="wallet" placeholder="Digite sua carteira Bitcoin">-->
-
-        <button id="submit-button">Apostar</button>
-        <div id="selected-numbers"></div>
+    <!-- Botões -->
+    <div class="button-container">
+        <a href="#como-funciona" class="btn-primary">Como funciona?</a>
+        <a href="/bet" class="btn-secondary">Fazer uma aposta</a>
     </div>
+
+    <!-- Sessão 'Como funciona?' -->
+    <section id="como-funciona" class="white-box">
+        <h2>Como funciona?</h2>
+        <p>
+            Os sorteios serão realizados pela loteria escolhida, não faremos escolhas de números (ainda que 'aleatórios').
+            Se você está jogando na MegaSena, os números serão divulgados pela MegaSena e apenas capturados automaticamente pelo nosso site.
+        </p>
+    </section>
+
+    <!-- Sessão 'O que eu ganho apostando?' -->
+    <section class="white-box">
+        <h2>O que eu ganho apostando?</h2>
+        <p>
+            Você sabia que a Loteria Federal do Brasil fica com mais de 55% do valor arrecadado com as apostas? Pois é, só de imposto de renda
+            são 27,5%, fora as outras contribuições 'voluntárias' que você paga como o fundo eleitoral, 'apoio' ao esporte, taxas, etc.
+            Aqui serão distribuídos SEMPRE 90% do valor arrecadado. Sim, a casa sempre ganha mas nas loterias estatais elas ganham muito mais. Veja:
+        </p>
+        <ul>
+            <li>19,13%: Fundo Nacional de Segurança Pública (FNSP).</li>
+            <li>17,32%: Seguridade Social.</li>
+            <li>10%: Fomento ao esporte.</li>
+            <li>7,76%: Fundo Nacional da Cultura.</li>
+            <li>3,14%: Cobertura de despesas de custeio e manutenção de serviços.</li>
+        </ul>
+
+    </section>
+
+    <!-- Sessão 'Como são distribuidos os prêmios?' -->
+    <section class="white-box">
+        <h2>Como serão distribuidos os prêmios?</h2>
+        <p>
+            Os prêmios SEMPRE serão divididos entre os acertados das maiores quantidades de números para um mesmo concurso.
+            NÃO acumulamos prêmios. Como assim? Por exemplo: Caso nenhum apostante acerte os números 6 números da mega-sena,
+            o valor arrecadado será dividido igualmente para aqueles que acertarem 5 números, ou 4 números, ou nenhum número!
+        </p>
+        <p>
+            Isso mesmo! Se 100 apostadores, apostarem cerca de R$1,00 e ninguém acertar nenhum número. TODOS receberão cerca de R$0,90.
+            AUTOMATICAMENTE, sem intervenção humana, assim que o sistema detectar automáticamente
+            Nos endereços cadastrados durante o registro do jogo.
+        </p>
+    </section>
 </main>
 
-<script src="/static/script.js"></script>
+<!-- Rodapé -->
+<footer class="footer white-box">
+    <p>A melhor loteria do mundo</p>
+</footer>
 </body>
 </html>
