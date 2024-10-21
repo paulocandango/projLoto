@@ -1,9 +1,16 @@
+html::before {
+    background-image: url("/static/bg.webp");
+    background-repeat: repeat;
+    opacity: 0.1;
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
     color: #343a40;
     margin: 0;
     padding: 20px;
+    height: 100%;
 }
 
 /* Adicionando um pseudo-elemento para aplicar a transparência somente ao fundo */
@@ -46,7 +53,7 @@ label {
     margin-bottom: 10px;
 }
 
-select, input, button {
+select, input, button, textarea {
     width: 100%;
     padding: 10px;
     margin-bottom: 20px;
