@@ -5,18 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LotteryBTC</title>
     <link rel="stylesheet" href="/static/styles.css">
-
 </head>
 <body>
 <header class="form-container" style="max-width: 90%">
-    <h1>LotteryBTC</h1>
+    <h1>Lottery BTC</h1>
 </header>
 <div>
     &nbsp;
 </div>
 <main>
     <div class="form-container" style="max-width: 90%">
-        <!-- TABELA -->
         <table class="table-discret">
             <thead>
             <tr>
@@ -24,6 +22,7 @@
                 <th>URL dos Resultados</th>
                 <th>Seletor do Concurso</th>
                 <th>Seletor dos Números Sorteados</th>
+                <th>Ações</th> <!-- Coluna para as ações -->
             </tr>
             </thead>
             <tbody>
@@ -33,6 +32,14 @@
                 <td>{{ lottery.1 }}</td>
                 <td>{{ lottery.2 }}</td>
                 <td>{{ lottery.3 }}</td>
+                <td>
+                    <form action="/delete" method="post">
+                        <input type="hidden" name="lottery_name" value="{{ lottery.0 }}">
+                        <button type="submit" class="delete-button">
+                            <img src="/static/trash.png" alt="Deletar" style="width:24px;">
+                        </button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
             </tbody>

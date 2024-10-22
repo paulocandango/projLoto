@@ -213,3 +213,15 @@ select, input, button, textarea {
     border-left: 5px solid #FF8C00; /* Destaque na primeira coluna */
 }
 
+.delete-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-button img {
+    width: 24px;
+    height: 24px;
+}
+
+

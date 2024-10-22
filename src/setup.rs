@@ -1,4 +1,5 @@
-use actix_web::{web, Responder};
+use std::collections::HashMap;
+use actix_web::{web, Responder, HttpResponse};
 use tera::{Tera, Context};
 use mysql_async::{Pool, prelude::*};
 
@@ -9,11 +10,9 @@ pub async fn setup(tmpl: web::Data<Tera>) -> impl Responder {
     // Conectando ao banco de dados MySQL e buscando os dados da tabela Lottery
     match fetch_lottery_data().await {
         Ok(results) => {
-            // Adiciona os resultados no contexto para o template
             context.insert("lottery_data", &results);
         }
         Err(e) => {
-            // Em caso de erro, insere a mensagem de erro no contexto para o template
             context.insert("db_error", &e.to_string());
         }
     }
@@ -22,26 +21,42 @@ pub async fn setup(tmpl: web::Data<Tera>) -> impl Responder {
     let rendered = tmpl.render("setup.html", &context).unwrap();
 
     // Retorna o HTML renderizado como resposta
-    actix_web::HttpResponse::Ok()
+    HttpResponse::Ok()
         .content_type("text/html")
         .body(rendered)
 }
 
+// Função para buscar os dados da tabela
 async fn fetch_lottery_data() -> Result<Vec<(String, String, String, String)>, Box<dyn std::error::Error>> {
-    // URL de conexão ao MySQL
     let url = "mysql://root:123456@localhost/loto";
-
-    // Cria o pool de conexões
     let pool = Pool::new(url);
-
-    // Estabelece uma conexão
     let mut conn = pool.get_conn().await?;
-
-    // Executa a consulta na tabela Lottery
     let result: Vec<(String, String, String, String)> = conn
         .query("SELECT lottery_name, results_url, contest_selector, numbers_selector FROM Lottery")
         .await?;
-
-    // Retorna o resultado da consulta
     Ok(result)
+}
+
+// Controller para a rota /delete (exclusão)
+pub async fn delete_lottery(form: web::Form<HashMap<String, String>>) -> impl Responder {
+    let lottery_name = form.get("lottery_name").unwrap().to_string();
+
+    // Executa a exclusão do registro no banco
+    match delete_lottery_by_name(&lottery_name).await {
+        Ok(_) => HttpResponse::SeeOther().header("Location", "/setup").finish(),
+        Err(e) => HttpResponse::InternalServerError().body(format!("Erro ao excluir: {}", e)),
+    }
+}
+
+// Função que executa o DELETE no banco de dados
+async fn delete_lottery_by_name(lottery_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let url = "mysql://root:123456@localhost/loto";
+    let pool = Pool::new(url);
+    let mut conn = pool.get_conn().await?;
+
+    // Executa o DELETE
+    conn.exec_drop("DELETE FROM Lottery WHERE lottery_name = :name", params! { "name" => lottery_name })
+        .await?;
+
+    Ok(())
 }

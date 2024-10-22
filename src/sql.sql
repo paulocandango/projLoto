@@ -16,4 +16,11 @@ VALUES
 ('Powerball', 'https://www.powerball.com/results', '.pb-concurso-id', '.pb-numeros-sorteados'),
 ('China Welfare Lottery', 'https://www.cwl.gov.cn/results', '.cwl-concurso-id', '.cwl-numeros-sorteados');
 
+
+INSERT INTO Lottery (lottery_name, results_url, contest_selector, numbers_selector)
+VALUES 
+('Loteria1', 'https://www.loteria1.com.br/resultados', '.concurso-id', '.numeros-sorteados'),
+('Loteria2', 'https://www.loteria2.com.br/resultados', '.concurso-id', '.numeros-sorteados'),
+('Loteria3', 'https://www.loteria3.com.br/resultados', '.concurso-id', '.numeros-sorteados');
+
 SELECT * FROM Lottery;
