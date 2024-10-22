@@ -95,29 +95,6 @@ async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
 }
 
 
-// Controller para a rota /placeBet
-async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl Responder {
-    println!("--- Registrando Aposta ---");
-    println!("Loteria: {}", form.lottery);
-    println!("Carteira Bitcoin: {}", form.wallet);
-    println!("Números escolhidos: {:?}", parse_numbers(&form.numbers));
-
-    // Criando contexto para a página placebet.html
-    let mut context = Context::new();
-    context.insert("lottery", &form.lottery);
-    context.insert("wallet", &form.wallet);
-    context.insert("numbers", &form.numbers);
-
-    // Renderiza o template usando Tera
-    let rendered = tmpl.render("placebet.html", &context).unwrap();
-
-    // Retorna o HTML renderizado como resposta com o cabeçalho correto
-    actix_web::HttpResponse::Ok()
-        .content_type("text/html") // Define o tipo de conteúdo como HTML
-        .body(rendered) // Adiciona o corpo da resposta
-}
-
-
 #[derive(serde::Deserialize)]
 struct BetForm {
     lottery: String,
@@ -146,4 +123,28 @@ fn parse_numbers(numbers_str: &str) -> Vec<i32> {
         .split(',') // Divide a string pelos separadores de vírgula
         .filter_map(|s| s.trim().parse::<i32>().ok()) // Remove espaços e faz o parsing para i32
         .collect() // Coleta os resultados em um vetor
+}
+
+//-----------------------------------------------------------------------------------
+
+// Controller para a rota /placeBet
+async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl Responder {
+    println!("--- Registrando Aposta ---");
+    println!("Loteria: {}", form.lottery);
+    println!("Carteira Bitcoin: {}", form.wallet);
+    println!("Números escolhidos: {:?}", parse_numbers(&form.numbers));
+
+    // Criando contexto para a página placebet.html
+    let mut context = Context::new();
+    context.insert("lottery", &form.lottery);
+    context.insert("wallet", &form.wallet);
+    context.insert("numbers", &form.numbers);
+
+    // Renderiza o template usando Tera
+    let rendered = tmpl.render("placebet.html", &context).unwrap();
+
+    // Retorna o HTML renderizado como resposta com o cabeçalho correto
+    actix_web::HttpResponse::Ok()
+        .content_type("text/html") // Define o tipo de conteúdo como HTML
+        .body(rendered) // Adiciona o corpo da resposta
 }
