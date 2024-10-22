@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LotteryBTC</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="form-container" style="max-width: 90%">
+    <h1>Lottery BTC</h1>
+</header>
+<div>
+    &nbsp;
+</div>
+<main>
+    <div class="form-container" style="max-width: 90%">
+        <form action="/create" method="post">
+            <label for="lottery_name">Nome da Loteria</label>
+            <input type="text" id="lottery_name" name="lottery_name" required>
+
+            <label for="results_url">URL dos Resultados</label>
+            <input type="url" id="results_url" name="results_url" required>
+
+            <label for="contest_selector">Seletor do Concurso</label>
+            <input type="text" id="contest_selector" name="contest_selector" required>
+
+            <label for="numbers_selector">Seletor dos Números Sorteados</label>
+            <input type="text" id="numbers_selector" name="numbers_selector" required>
+
+            <button type="submit" class="submit-button">Salvar</button>
+        </form>
+    </div>
+</main>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

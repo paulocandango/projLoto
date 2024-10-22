@@ -39,10 +39,10 @@ async fn main() {
 // Função que imprime um log quando é executada
 async fn update_crawlers() {
     println!("--- Executando update_crawlers ----");
-    //mega_sena_crawler::executar().await;
-    //loto_facil_crawler::executar().await;
-    //power_ball_crawler::executar().await;
-    //china_welfare_crawler::executar().await;
+    mega_sena_crawler::executar().await;
+    loto_facil_crawler::executar().await;
+    power_ball_crawler::executar().await;
+    china_welfare_crawler::executar().await;
 }
 
 // Função para inicializar o servidor HTTP
@@ -57,6 +57,8 @@ async fn start_server() -> std::io::Result<()> {
             .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
             .route("/", web::get().to(index))
             .route("/setup", web::get().to(setup::setup))
+            .route("/create", web::post().to(setup::create_lottery))
+            .route("/createsetup", web::get().to(setup::create_setup))
             .route("/delete", web::post().to(setup::delete_lottery)) // Nova rota de exclusão
             .route("/bet", web::get().to(bet::bet))
             .route("/placeBet", web::post().to(bet::place_bet))
