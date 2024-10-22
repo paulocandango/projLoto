@@ -16,6 +16,7 @@ job_scheduler = "1.2"
 tokio = { version = "1", features = ["full"] }
 time = "0.3.36"
 serde = { version = "1.0.210", features = ["derive"] }  # ou a versão mais recente
+mysql_async = "0.30"
 #rust-lightning = "0.0.116"
 
 [dependencies.actix-rt]  # Ativar execução assíncrona para o servidor

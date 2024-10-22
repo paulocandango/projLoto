@@ -5,20 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LotteryBTC</title>
     <link rel="stylesheet" href="/static/styles.css">
+
 </head>
 <body>
-<header class="form-container">
+<header class="form-container" style="max-width: 90%">
     <h1>LotteryBTC</h1>
 </header>
 <div>
     &nbsp;
 </div>
 <main>
-    <div class="form-container">
-        Pesquisar
-        Alterar
-        Criar Novo
-        Excluir
+    <div class="form-container" style="max-width: 90%">
+        <!-- TABELA -->
+        <table class="table-discret">
+            <thead>
+            <tr>
+                <th>Nome da Loteria</th>
+                <th>URL dos Resultados</th>
+                <th>Seletor do Concurso</th>
+                <th>Seletor dos Números Sorteados</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for lottery in lottery_data %}
+            <tr>
+                <td>{{ lottery.0 }}</td>
+                <td>{{ lottery.1 }}</td>
+                <td>{{ lottery.2 }}</td>
+                <td>{{ lottery.3 }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Caso haja algum erro de banco de dados -->
+        {% if db_error %}
+        <p class="error">Erro ao buscar os dados: {{ db_error }}</p>
+        {% endif %}
     </div>
 </main>
 

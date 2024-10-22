@@ -165,3 +165,51 @@ select, input, button, textarea {
     position: relative;
     bottom: 0;
 }
+
+.table-discret {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    text-align: left;
+    color: #333;
+}
+
+.table-discret th,
+.table-discret td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd; /* Bordas discretas */
+}
+
+.table-discret thead th {
+    background-color: #f4f4f4; /* Cabeçalho com leve destaque */
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.table-discret tbody tr {
+    transition: background-color 0.3s ease; /* Transição suave */
+}
+
+.table-discret tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Alternância de cores entre as linhas */
+}
+
+.table-discret tbody tr:hover {
+    background-color: #f1f1f1; /* Cor de destaque ao passar o mouse */
+}
+
+.table-discret a {
+    color: #FF8C00; /* Links com cor azul */
+    text-decoration: none;
+}
+
+.table-discret a:hover {
+    text-decoration: underline;
+}
+
+.table-discret td:first-child {
+    border-left: 5px solid #FF8C00; /* Destaque na primeira coluna */
+}
+
