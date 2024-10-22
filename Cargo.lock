@@ -1768,6 +1768,7 @@ dependencies = [
  "job_scheduler",
  "reqwest 0.11.27",
  "scraper",
+ "serde",
  "tera",
  "thirtyfour",
  "time",

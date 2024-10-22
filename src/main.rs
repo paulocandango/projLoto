@@ -54,8 +54,9 @@ async fn start_server() -> std::io::Result<()> {
             .data(tera.clone()) // Compartilha o Tera com o App
             .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
             .route("/", web::get().to(index))
-            .route("/bet", web::get().to(bet))
             .route("/setup", web::get().to(setup))
+            .route("/bet", web::get().to(bet))
+            .route("/placeBet", web::post().to(place_bet))
     })
         .bind("127.0.0.1:8080")?
         .run()
@@ -79,7 +80,9 @@ async fn index(tmpl: web::Data<Tera>) -> impl Responder {
 
 // Controller para a rota /bet
 async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
+
     let mut context = Context::new();
+
     let nome_pessoa = "Paulo".to_string(); // Define a variável com o nome
     context.insert("nome_pessoa", &nome_pessoa); // Insere a variável no contexto
 
@@ -89,6 +92,27 @@ async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
     actix_web::HttpResponse::Ok()
         .content_type("text/html") // Define o tipo de conteúdo como HTML
         .body(rendered) // Adiciona o corpo da resposta
+}
+
+
+// Controller para a rota /placeBet
+async fn place_bet(form: web::Form<BetForm>) -> impl Responder {
+    println!("--- Registrando Aposta ---");
+    println!("Loteria: {}", form.lottery);
+    println!("Carteira Bitcoin: {}", form.wallet);
+
+
+    println!("Carteira Bitcoin: {:?}", parse_numbers(&form.numbers));
+
+    // Retornar uma resposta de sucesso
+    actix_web::HttpResponse::Ok().body("Aposta recebida!")
+}
+
+#[derive(serde::Deserialize)]
+struct BetForm {
+    lottery: String,
+    wallet: String,
+    numbers: String,
 }
 
 
@@ -104,4 +128,12 @@ async fn setup(tmpl: web::Data<Tera>) -> impl Responder {
     actix_web::HttpResponse::Ok()
         .content_type("text/html") // Define o tipo de conteúdo como HTML
         .body(rendered) // Adiciona o corpo da resposta
+}
+
+
+fn parse_numbers(numbers_str: &str) -> Vec<i32> {
+    numbers_str
+        .split(',') // Divide a string pelos separadores de vírgula
+        .filter_map(|s| s.trim().parse::<i32>().ok()) // Remove espaços e faz o parsing para i32
+        .collect() // Coleta os resultados em um vetor
 }

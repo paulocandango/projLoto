@@ -2,7 +2,7 @@ html {
     background-color: white; /* Define o fundo da página como branco */
     background-image: url("/static/bg4.png"); /* Define a imagem de fundo */
     background-repeat: repeat-x; /* A imagem se repete horizontalmente */
-    background-position: top center; /* A imagem é posicionada no topo e centralizada */
+    background-position: top left; /* A imagem é posicionada no topo e centralizada */
     overflow-y: scroll; /* Permite rolagem vertical */
 }
 

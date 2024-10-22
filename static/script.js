@@ -1,8 +1,9 @@
-const lotterySelect = document.getElementById('lottery-select');
+const lotterySelect = document.getElementById('lottery');
 const numberBallsContainer = document.getElementById('number-balls');
 const selectedNumbersDiv = document.getElementById('selected-numbers');
-const wallet = document.getElementById('wallet');
 const submitbutton = document.getElementById('submit-button');
+const numbers = document.getElementById('numbers');
+const wallet = document.getElementById('wallet');
 
 let selectedNumbers = [];
 
@@ -33,6 +34,7 @@ function toggleBallSelection(ball, number) {
 // Atualiza os números selecionados
 function updateSelectedNumbers() {
     selectedNumbersDiv.innerText = selectedNumbers.join(' ');
+    numbers.value = selectedNumbers;
 }
 
 // Habilita bolas conforme a seleção da loteria
@@ -52,7 +54,7 @@ lotterySelect.addEventListener('change', () => {
 
     // Zera os numeros escolhidos
     selectedNumbers = [];
-    selectedNumbersDiv.innerText = "";
+    updateSelectedNumbers();
 });
 
 // Inicializa com Powerball
@@ -66,6 +68,12 @@ submitbutton.addEventListener('click', function(event) {
 
     if(!isSelectionValid(selectedNumbers.length)){
         alert('Escolha os numeros de acordo com as quantidades apropriadas para o seu sorteio!');
+        event.preventDefault();  // Cancela o envio do formulário
+        return;
+    }
+
+    if(wallet.value === ""){
+        alert('Informe o número do endereço que receberá o prêmio!');
         event.preventDefault();  // Cancela o envio do formulário
         return;
     }
