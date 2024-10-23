@@ -112,23 +112,32 @@ pub fn generate_qr_code_base64(data: &str) -> String {
     // Cria o QR Code a partir do dado fornecido
     let code = QrCode::new(data).unwrap();
 
-    // Obtém a matriz de módulos do QR Code (como uma slice de bools)
+    // Obtém a largura do QR Code
     let width = code.width();
     let data = code.to_vec(); // Cada elemento é um bool: true = preto, false = branco
 
-    // Cria um buffer de imagem (escala de cinza)
-    let mut image = ImageBuffer::new(width as u32, width as u32);
+    // Define o fator de escala para ampliar a imagem (8x maior)
+    let scale = 6;
 
-    // Preenche a imagem com os pixels do QR Code
+    // Cria um buffer de imagem com o novo tamanho (escala aplicada)
+    let mut image = ImageBuffer::new((width * scale) as u32, (width * scale) as u32);
+
+    // Preenche a imagem com os pixels do QR Code aplicando a escala
     for x in 0..width {
         for y in 0..width {
-            let idx = y * width + x; // Calcula o índice correto na matriz linear
+            let idx = y * width + x; // Calcula o índice na matriz linear
             let color = if data[idx] {
                 Luma([0]) // Preto
             } else {
                 Luma([255]) // Branco
             };
-            image.put_pixel(x as u32, y as u32, color);
+
+            // Preenche os pixels ampliados
+            for dx in 0..scale {
+                for dy in 0..scale {
+                    image.put_pixel((x * scale + dx) as u32, (y * scale + dy) as u32, color);
+                }
+            }
         }
     }
 
