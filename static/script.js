@@ -9,13 +9,16 @@ let selectedNumbers = [];
 
 // Gera as bolas
 function generateBalls(max) {
-    numberBallsContainer.innerHTML = '';
-    for (let i = 1; i <= max; i++) {
-        const ball = document.createElement('div');
-        ball.className = 'ball';
-        ball.innerText = i;
-        ball.addEventListener('click', () => toggleBallSelection(ball, i));
-        numberBallsContainer.appendChild(ball);
+    if(numberBallsContainer){
+        numberBallsContainer.innerHTML = '';
+
+        for (let i = 1; i <= max; i++) {
+            const ball = document.createElement('div');
+            ball.className = 'ball';
+            ball.innerText = i;
+            ball.addEventListener('click', () => toggleBallSelection(ball, i));
+            numberBallsContainer.appendChild(ball);
+        }
     }
 }
 
@@ -37,60 +40,65 @@ function updateSelectedNumbers() {
     numbers.value = selectedNumbers;
 }
 
-// Habilita bolas conforme a seleção da loteria
-lotterySelect.addEventListener('change', () => {
-    const value = lotterySelect.value;
-    if(value === ''){
-        generateBalls(0);
-    } else if (value === 'megasena') {
-        generateBalls(60);
-    } else if (value === 'lotofacil') {
-        generateBalls(25);
-    } else if (value === 'powerball') {
-        generateBalls(69);
-    } else if (value === 'chinawelfare') {
-        generateBalls(33);
-    }
+if(lotterySelect) {
+    lotterySelect.addEventListener('change', () => {
+        const value = lotterySelect.value;
+        if(value === ''){
+            generateBalls(0);
+        } else if (value === 'Brasil - Mega Sena') {
+            generateBalls(60);
+        } else if (value === 'Brasil - Loto Facil') {
+            generateBalls(25);
+        } else if (value === 'United States - Power Ball') {
+            generateBalls(69);
+        } else if (value === 'China - WelFare Lottery') {
+            generateBalls(33);
+        } else {
+            generateBalls(99);
+        }
 
-    // Zera os numeros escolhidos
-    selectedNumbers = [];
-    updateSelectedNumbers();
-});
+        // Zera os numeros escolhidos
+        selectedNumbers = [];
+        updateSelectedNumbers();
+    });
+}
 
 // Inicializa com Powerball
 generateBalls(0);
 
 //----------------- REGRAS DE VALIDAÇÃO DOS TIPOS DE LOTERIAS ------------------------------------
 // Adiciona verificação ao clicar no botão de submit
-submitbutton.addEventListener('click', function(event) {
+if(submitbutton){
+    submitbutton.addEventListener('click', function(event) {
 
-    const selectedLottery = lotterySelect.value;
+        const selectedLottery = lotterySelect.value;
 
-    if(!isSelectionValid(selectedNumbers.length)){
-        alert('Escolha os numeros de acordo com as quantidades apropriadas para o seu sorteio!');
-        event.preventDefault();  // Cancela o envio do formulário
-        return;
-    }
+        if(!isSelectionValid(selectedNumbers.length)){
+            alert('Escolha os numeros de acordo com as quantidades apropriadas para o seu sorteio!');
+            event.preventDefault();  // Cancela o envio do formulário
+            return;
+        }
 
-    if(wallet.value === ""){
-        alert('Informe o número do endereço que receberá o prêmio!');
-        event.preventDefault();  // Cancela o envio do formulário
-        return;
-    }
+        if(wallet.value === ""){
+            alert('Informe o número do endereço que receberá o prêmio!');
+            event.preventDefault();  // Cancela o envio do formulário
+            return;
+        }
 
-});
+    });
+}
 
 function isSelectionValid(newLength) {
 
     const value = lotterySelect.value;
 
-    if (value === 'megasena') {
+    if (value === 'Brasil - Mega Sena') {
         return newLength >= 6 && newLength <= 15;
-    } else if (value === 'lotofacil') {
+    } else if (value === 'Brasil - Loto Facil') {
         return newLength >= 15 && newLength <= 20;
-    } else if (value === 'powerball') {
+    } else if (value === 'United States - Power Ball') {
         return newLength === 6;
-    } else if (value === 'chinawelfare') {
+    } else if (value === 'China - WelFare Lottery') {
         return newLength === 7;
     } else if (value === '') {
         return false;
