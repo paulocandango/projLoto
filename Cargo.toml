@@ -20,8 +20,8 @@ mysql_async = "0.30"
 serde_json = "1.0.132"
 num-format = "0.4"
 base64 = "0.21"
-image = { version = "0.24", features = ["png"] }
-#rust-lightning = "0.0.116"
+image = { version = "0.25.4", features = ["png"] }
+qrcode = "0.7"
 
 [dependencies.actix-rt]  # Ativar execução assíncrona para o servidor
 version = "2.5"

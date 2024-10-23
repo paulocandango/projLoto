@@ -20,7 +20,7 @@
         <p><strong>Loteria Escolhida:</strong> {{ lottery }}</p>
         <p><strong>Carteira Bitcoin:</strong> {{ wallet }}</p>
         <p><strong>Números Escolhidos:</strong> {{ numbers }}</p>
-        <p><strong>Total arrecadado até aqui:</strong> {{ balance }} satoshis</p>
+        <p><strong>Total arrecadado até aqui:</strong> {{ formatted_balance }} satoshis</p>
 
         <h3>QR Code para Pagamento</h3>
         <img src="{{ qr_code_base64 }}" alt="QR Code de Pagamento" />
