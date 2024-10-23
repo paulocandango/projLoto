@@ -17,9 +17,10 @@
     <div class="form-container">
         <h2>Detalhes da Aposta</h2>
 
-        <p><strong>Loteria Escolhida:</strong> {{ lottery }}</p>
-        <p><strong>Carteira Bitcoin:</strong> {{ wallet }}</p>
-        <p><strong>Números Escolhidos:</strong> {{ numbers }}</p>
+        <input type="hidden" id="checking_id2" value="{{ checking_id }}">
+        <p><strong>Loteria Escolhida:</strong> <input type="hidden" id="lottery2" value="{{ lottery }}">{{ lottery }}</p>
+        <p><strong>Carteira Bitcoin:</strong> <input type="hidden" id="wallet2" value="{{ wallet }}">{{ wallet }}</p>
+        <p><strong>Números Escolhidos:</strong> <input type="hidden" id="numbers2" value="{{ numbers }}">{{ numbers }}</p>
         <p><strong>Total arrecadado até aqui:</strong> {{ formatted_balance }} satoshis</p>
 
         <br />
@@ -52,15 +53,22 @@
 <script>
     {# const checking_id = "{{checking_id}}"; #}
     const checking_id = "fba527992b3ca144c72b460b4b6a1a10c00e9a75bd4d23c7b6672c565f7f615c";
+    // Captura os valores do HTML
+    const lottery2 = document.getElementById("lottery2").value;
+    const wallet2 = document.getElementById("wallet2").value;
+    const numbers2 = document.getElementById("numbers2").value;
+    const checking_id2 = document.getElementById("checking_id2").value;
 
     // Variável para armazenar o ID do intervalo
     let intervalId;
 
     async function validatePayment() {
         try {
-            const response = await fetch(`/validatePayment?hash=${encodeURIComponent(checking_id)}`, {
-                method: 'GET',
-            });
+            // Monta a URL com os parâmetros na query string
+            const url = `/validatePayment?hash=${encodeURIComponent(checking_id)}&lottery=${encodeURIComponent(lottery2)}&wallet=${encodeURIComponent(wallet2)}&numbers=${encodeURIComponent(numbers2)}`;
+
+            // Faz a requisição para o backend
+            const response = await fetch(url, { method: 'GET' });
 
             if (response.ok) {
                 const message = await response.text(); // Lê a resposta como texto

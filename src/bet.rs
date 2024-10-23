@@ -180,10 +180,25 @@ pub struct PaymentStatus {
 
 #[derive(Deserialize)]
 pub struct PaymentQuery {
-    hash: String,
+    pub hash: String,
+    pub lottery: String,
+    pub wallet: String,
+    pub numbers: String,
 }
 
 pub async fn validate_payment(query: web::Query<PaymentQuery>) -> Result<HttpResponse, Box<dyn StdError>> {
+
+    let payment_hash = &query.hash;
+    let lottery = &query.lottery;
+    let wallet = &query.wallet;
+    let numbers = &query.numbers;
+
+    println!("Recebendo dados da requisição:");
+    println!("Hash: {}", payment_hash);
+    println!("Loteria: {}", lottery);
+    println!("Carteira: {}", wallet);
+    println!("Números: {}", numbers);
+
     let payment_hash = &query.hash;
     let api_url = format!("https://demo.lnbits.com/api/v1/payments/{}", payment_hash);
     let api_key = "4b63979273164f77ab6df8c7fd68e5ae";

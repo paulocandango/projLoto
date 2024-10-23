@@ -36,7 +36,7 @@ VALUES
 ('Mega Sena', 'https://www.megasena.com.br/resultados', '.concurso-id', '.numeros-sorteados'),
 ('Lotofacil', 'https://www.lotofacil.com.br/resultados', '#concurso-lotofacil', '.lotofacil-numeros'),
 ('Powerball', 'https://www.powerball.com/results', '.pb-concurso-id', '.pb-numeros-sorteados'),
-('China Welfare Lottery', 'https://www.cwl.gov.cn/results', '.cwl-concurso-id', '.cwl-numeros-sorteados');
+('Welfare Lottery', 'https://www.cwl.gov.cn/results', '.cwl-concurso-id', '.cwl-numeros-sorteados');
 
 
 INSERT INTO Lottery (lottery_name, results_url, contest_selector, numbers_selector)
