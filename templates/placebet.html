@@ -22,18 +22,24 @@
         <p><strong>Números Escolhidos:</strong> {{ numbers }}</p>
         {# <p><strong>Total arrecadado até aqui:</strong> {{ formatted_balance }} satoshis</p> #}
 
+        <br />
+        <br />
         <h1 class="form-container" style="text-align: center">
             Aguardando Pagamento... <br /><br />
-            <img src="/static/load.gif">
+            <img src="/static/load.gif" width="100" height="100">
         </h1>
+        <br />
+        <br />
 
-        <h3>QR Code para Pagamento</h3>
-        {# <img src="{{ qr_code_base64 }}" alt="QR Code de Pagamento" /> #}
-        <img src="/static/qrcodeFAKE.jpg" alt="QR Code de Pagamento" />
+        <div style="text-align: center">
+            <h3>QR Code para Pagamento</h3>
+            {# <img src="{{ qr_code_base64 }}" alt="QR Code de Pagamento" /> #}
+            <img src="/static/qrcodeFAKE.jpg" alt="QR Code de Pagamento" />
 
-        <p><strong>Fatura:</strong></p>
-        {# <div style="word-break: break-word; overflow-wrap: break-word;">{{ qrcode }}</div> #}
-        <div style="word-break: break-word; overflow-wrap: break-word;">lnbc5u1pn3jzhwsp558rn9zhz26dscvg56xxgjqk9a3vhj84syvlletshr3etnc9e2despp5q7qa8gjdd9jsc5w89hrfxp3dpkvp8539cnjllaylah3epyxsdxgqdqug9cx7um5vysycmm5w3jhy72z23pscqpjrzjq2ucdwlw3myns2gfugeyk3hetpwjx69njqme3ewnwurt45wv9n6x6rx9mcqqfpsqqyqqqqqqqqqqqqqq2q9qxpqysgqjqvt59se40xh6s4x620587tszdynsk2vh0g6cjt07slz5zr7n4w42shu965ns9gs487gyltv020e9x2ljc0zqnwdp7xamcsl6w76qmcqv738dd</div>
+            <p><strong>Fatura:</strong></p>
+            {# <div style="word-break: break-word; overflow-wrap: break-word;">{{ qrcode }}</div> #}
+            <div style="word-break: break-word; overflow-wrap: break-word;">lnbc5u1pn3jzhwsp558rn9zhz26dscvg56xxgjqk9a3vhj84syvlletshr3etnc9e2despp5q7qa8gjdd9jsc5w89hrfxp3dpkvp8539cnjllaylah3epyxsdxgqdqug9cx7um5vysycmm5w3jhy72z23pscqpjrzjq2ucdwlw3myns2gfugeyk3hetpwjx69njqme3ewnwurt45wv9n6x6rx9mcqqfpsqqyqqqqqqqqqqqqqq2q9qxpqysgqjqvt59se40xh6s4x620587tszdynsk2vh0g6cjt07slz5zr7n4w42shu965ns9gs487gyltv020e9x2ljc0zqnwdp7xamcsl6w76qmcqv738dd</div>
+        </div>
 
 
 
@@ -41,5 +47,33 @@
 </main>
 
 <script src="/static/script.js"></script>
+
+
+<script>
+    const paymentHash = "f165fd623df25542d8f211d7c6ace486eb63920eae008ec5be884d677d7f358d"; // Substitua pelo hash dinâmico da sua fatura
+
+    async function validatePayment() {
+        try {
+            const response = await fetch(`/validatePayment?hash=${encodeURIComponent(paymentHash)}`, {
+                method: 'GET',
+            });
+
+            if (response.ok) {
+                const message = await response.text(); // Lê a resposta como texto
+                alert(message); // Exibe o alerta com o texto apropriado
+            } else {
+                console.error('Erro ao validar pagamento:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Erro de conexão:', error);
+        }
+    }
+
+    // Executa a função a cada 10 segundos
+    setInterval(validatePayment, 10000);
+</script>
+
+
+
 </body>
 </html>

@@ -1,13 +1,15 @@
-use actix_web::{web, Responder};
+use actix_web::{web, Responder, HttpResponse, Error};
 use tera::{Tera, Context};
 use crate::{parse_numbers, BetForm};
 use reqwest::Client;
-use serde_json::Value;
+use serde_json::{from_str, Value};
 use base64::encode;
 use std::io::Cursor;
 use image::{Luma, ImageBuffer, DynamicImage, ImageFormat};
 use qrcode::QrCode;
 use num_format::{Locale, ToFormattedString};
+use serde::Deserialize;
+use std::error::Error as StdError;
 
 // Controller para a rota /bet
 pub async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
@@ -125,7 +127,7 @@ pub fn generate_qr_code_base64(data: &str) -> String {
     let data = code.to_vec(); // Cada elemento é um bool: true = preto, false = branco
 
     // Define o fator de escala para ampliar a imagem (8x maior)
-    let scale = 6;
+    let scale = 4;
 
     // Cria um buffer de imagem com o novo tamanho (escala aplicada)
     let mut image = ImageBuffer::new((width * scale) as u32, (width * scale) as u32);
@@ -163,4 +165,64 @@ pub fn generate_qr_code_base64(data: &str) -> String {
 
     // Retorna a imagem como uma data URI para exibição em HTML
     format!("data:image/png;base64,{}", base64_string)
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+pub struct PaymentStatus {
+    paid: bool,
+}
+
+#[derive(Deserialize)]
+pub struct PaymentQuery {
+    hash: String,
+}
+
+pub async fn validate_payment(query: web::Query<PaymentQuery>) -> Result<HttpResponse, Box<dyn StdError>> {
+    let payment_hash = &query.hash;
+    let api_url = format!("https://demo.lnbits.com/api/v1/payments/{}", payment_hash);
+    let api_key = "4b63979273164f77ab6df8c7fd68e5ae";
+
+    let client = reqwest::Client::new();
+    match client
+        .get(&api_url)
+        .header("X-Api-Key", api_key)
+        .send()
+        .await
+    {
+        Ok(mut response) => {
+            let status = response.status();
+            let body = response.text().await.unwrap_or_else(|_| "Erro ao ler corpo".to_string());
+
+            println!("Status: {}, Corpo: {}", status, body);
+
+            if status.is_success() {
+                if let Ok(json) = from_str::<Value>(&body) {
+                    if json.get("paid").and_then(Value::as_bool) == Some(true) {
+                        return Ok(HttpResponse::Ok().body("Pagamento Confirmado"));
+                    }
+                }
+            }
+        }
+        Err(err) => {
+            eprintln!("Erro na requisição: {:?}", err);
+        }
+    }
+
+    Ok(HttpResponse::Ok().body("Aguardando confirmação do pagamento..."))
+}
+
+pub async fn paymentMade(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl Responder {
+
+    println!("--- Aposta Confirmada ---");
+
+    let mut context = Context::new();
+    context.insert("variavel", "valor");
+
+    let rendered = tmpl.render("paymentMade.html", &context).unwrap();
+
+    actix_web::HttpResponse::Ok()
+        .content_type("text/html")
+        .body(rendered)
 }

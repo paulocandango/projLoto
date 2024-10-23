@@ -62,6 +62,8 @@ async fn start_server() -> std::io::Result<()> {
             .route("/delete", web::post().to(setup::delete_lottery)) // Nova rota de exclusão
             .route("/bet", web::get().to(bet::bet))
             .route("/placeBet", web::post().to(bet::place_bet))
+            .route("/validatePayment", web::get().to(bet::validate_payment))
+            .route("/paymentMade", web::post().to(bet::paymentMade))
     })
         .bind("127.0.0.1:8080")?
         .run()
