@@ -11,9 +11,6 @@ pub async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
 
     let mut context = Context::new();
 
-    let nome_pessoa = "Paulo".to_string(); // Define a variável com o nome
-    context.insert("nome_pessoa", &nome_pessoa); // Insere a variável no contexto
-
     // Renderiza o template usando Tera
     let rendered = tmpl.render("bet.html", &context).unwrap();
     // Retorna o HTML renderizado como resposta com o cabeçalho correto
