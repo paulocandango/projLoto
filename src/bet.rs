@@ -7,6 +7,7 @@ use base64::encode;
 use std::io::Cursor;
 use image::{Luma, ImageBuffer, DynamicImage, ImageFormat};
 use qrcode::QrCode;
+use num_format::{Locale, ToFormattedString};
 
 // Controller para a rota /bet
 pub async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
@@ -31,13 +32,17 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
     println!("Carteira Bitcoin: {}", form.wallet);
     println!("Números escolhidos: {:?}", form.numbers);
 
+    // RECUPERA O BALANÇO DA CARTEIRA
     let formatted_balance = get_wallet_details().await.unwrap_or_else(|e| {
         println!("Erro ao obter saldo: {}", e);
         "0".to_string()
-    });
+    })
+        .parse::<u64>() // Converte para u64 para formatação
+        .unwrap_or(0)
+        .to_formatted_string(&Locale::en);
 
-    // Gera a fatura Lightning
-    let payment_request = match create_invoice(1000, "Aposta LotteryBTC").await {
+    // GERA A FATURA LIGHTNING
+    let payment_request = match create_invoice(500, "Aposta LotteryBTC").await {
         Ok(request) => request,
         Err(e) => {
             println!("Erro ao criar fatura: {}", e);
