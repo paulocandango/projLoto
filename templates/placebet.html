@@ -20,11 +20,11 @@
         <p><strong>Loteria Escolhida:</strong> {{ lottery }}</p>
         <p><strong>Carteira Bitcoin:</strong> {{ wallet }}</p>
         <p><strong>Números Escolhidos:</strong> {{ numbers }}</p>
-        {# <p><strong>Total arrecadado até aqui:</strong> {{ formatted_balance }} satoshis</p> #}
+        <p><strong>Total arrecadado até aqui:</strong> {{ formatted_balance }} satoshis</p>
 
         <br />
         <br />
-        <h1 class="form-container" style="text-align: center">
+        <h1 class="form-container" style="text-align: center" id="aguardandoPagamento">
             Aguardando Pagamento... <br /><br />
             <img src="/static/load.gif" width="100" height="100">
         </h1>
@@ -50,18 +50,34 @@
 
 
 <script>
-    const paymentHash = "f165fd623df25542d8f211d7c6ace486eb63920eae008ec5be884d677d7f358d"; // Substitua pelo hash dinâmico da sua fatura
+    const checking_id = "{{checking_id}}"; // Substituído pelo hash dinâmico
+
+    // Variável para armazenar o ID do intervalo
+    let intervalId;
 
     async function validatePayment() {
         try {
-            const response = await fetch(`/validatePayment?hash=${encodeURIComponent(paymentHash)}`, {
+            const response = await fetch(`/validatePayment?hash=${encodeURIComponent(checking_id)}`, {
                 method: 'GET',
             });
 
             if (response.ok) {
                 const message = await response.text(); // Lê a resposta como texto
-                alert(message); // Exibe o alerta com o texto apropriado
+
+                if (message === "Pagamento Confirmado") {
+                    alert(message); // Exibe o alerta
+
+                    // Para o intervalo de execução da função
+                    clearInterval(intervalId);
+
+                    // Altera o conteúdo do elemento h1
+                    const h1Element = document.getElementById("aguardandoPagamento");
+                    if (h1Element) {
+                        h1Element.innerHTML = "PAGAMENTO CONFIRMADO";
+                    }
+                }
             } else {
+                alert(message); // Exibe o alerta
                 console.error('Erro ao validar pagamento:', response.statusText);
             }
         } catch (error) {
@@ -69,8 +85,8 @@
         }
     }
 
-    // Executa a função a cada 10 segundos
-    setInterval(validatePayment, 10000);
+    // Executa a função a cada 10 segundos e armazena o ID do intervalo
+    intervalId = setInterval(validatePayment, 10000);
 </script>
 
 

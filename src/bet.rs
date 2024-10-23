@@ -44,13 +44,18 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
         .to_formatted_string(&Locale::en);
 
     // GERA A FATURA LIGHTNING
-    let payment_request = match create_invoice(500, "Aposta LotteryBTC").await {
-        Ok(request) => request,
+    let invoice_response = match create_invoice(100, "Aposta LotteryBTC").await {
+        Ok(response) => response,
         Err(e) => {
             println!("Erro ao criar fatura: {}", e);
             return actix_web::HttpResponse::InternalServerError().body("Erro ao gerar fatura");
         }
     };
+
+    // Recebe os atributos do response
+    let payment_request = invoice_response.get("payment_request").and_then(Value::as_str).unwrap_or("").to_string();
+    let checking_id = invoice_response.get("checking_id").and_then(Value::as_str).unwrap_or("").to_string();
+
     // Gera o QR Code com a fatura Lightning
     let qr_code_base64 = generate_qr_code_base64(&payment_request);
 
@@ -62,6 +67,7 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
     context.insert("formatted_balance", &formatted_balance);
     context.insert("qr_code_base64", &qr_code_base64);
     context.insert("qrcode", &payment_request);
+    context.insert("checking_id", &checking_id);
 
     // Renderiza o template HTML com o contexto
     let rendered = tmpl.render("placebet.html", &context).unwrap();
@@ -90,7 +96,7 @@ async fn get_wallet_details() -> Result<String, reqwest::Error> {
 }
 
 // Função para criar uma fatura e retornar o QR Code
-async fn create_invoice(amount: i64, memo: &str) -> Result<String, reqwest::Error> {
+async fn create_invoice(amount: i64, memo: &str) -> Result<Value, reqwest::Error> {
     let client = Client::new();
     let url = "https://demo.lnbits.com/api/v1/payments";
     let api_key = "4b63979273164f77ab6df8c7fd68e5ae";
@@ -110,7 +116,9 @@ async fn create_invoice(amount: i64, memo: &str) -> Result<String, reqwest::Erro
         .json::<Value>()
         .await?;
 
-    Ok(response["payment_request"].as_str().unwrap_or("").to_string())
+    println!("Invoice Response: {:?}", response); // Log para depuração
+
+    Ok(response) // Retorna o JSON inteiro
 }
 
 //------------------------------------------------------------------------------------------
