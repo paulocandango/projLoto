@@ -23,7 +23,7 @@
         <p><strong>Total arrecadado até aqui:</strong> {{ balance }} satoshis</p>
 
         <h3>QR Code para Pagamento</h3>
-        <img src="" alt="QR Code de Pagamento" />
+        <img src="{{ qr_code_base64 }}" alt="QR Code de Pagamento" />
 
         <p><strong>Fatura:</strong></p>
         <div style="word-break: break-word; overflow-wrap: break-word;">{{ qrcode }}</div>
