@@ -30,43 +30,37 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
     println!("--- Registrando Aposta ---");
     println!("Loteria: {}", form.lottery);
     println!("Carteira Bitcoin: {}", form.wallet);
-    println!("Números escolhidos: {:?}", parse_numbers(&form.numbers));
+    println!("Números escolhidos: {:?}", form.numbers);
 
-    // Dentro da função
-    let formatted_balance = match get_wallet_details().await {
-        Ok(wallet_info) => {
-            if let Some(balance) = wallet_info["balance"].as_i64() {
-                // Usando um locale válido
-                let locale = Locale::from_str("pt_BR").unwrap_or(Locale::en);
-                balance.to_formatted_string(&locale)
-            } else {
-                "0".to_string()
-            }
-        }
+    let formatted_balance = get_wallet_details().await.unwrap_or_else(|e| {
+        println!("Erro ao obter saldo: {}", e);
+        "0".to_string()
+    });
+
+    let qr_code = match create_invoice(1000, "Aposta LotteryBTC").await {
+        Ok(qr) => qr,
         Err(e) => {
-            println!("Erro ao consultar a carteira: {}", e);
-            "Erro ao obter saldo".to_string()
+            println!("Erro ao criar fatura: {}", e);
+            String::from("Erro ao gerar QR Code")
         }
     };
 
-    // Criando contexto para a página placebet.html
     let mut context = Context::new();
     context.insert("lottery", &form.lottery);
     context.insert("wallet", &form.wallet);
     context.insert("numbers", &form.numbers);
     context.insert("balance", &formatted_balance);
+    context.insert("qrcode", &qr_code); // Inserindo o QR Code no contexto
 
-    // Renderiza o template usando Tera
     let rendered = tmpl.render("placebet.html", &context).unwrap();
 
-    // Retorna o HTML renderizado como resposta com o cabeçalho correto
     actix_web::HttpResponse::Ok()
-        .content_type("text/html") // Define o tipo de conteúdo como HTML
-        .body(rendered) // Adiciona o corpo da resposta
+        .content_type("text/html")
+        .body(rendered)
 }
 
-// Função para obter detalhes da carteira via API LNBits
-async fn get_wallet_details() -> Result<Value, reqwest::Error> {
+// Função para obter detalhes da carteira
+async fn get_wallet_details() -> Result<String, reqwest::Error> {
     let client = Client::new();
     let url = "https://demo.lnbits.com/api/v1/wallet";
     let api_key = "4b63979273164f77ab6df8c7fd68e5ae";
@@ -79,6 +73,30 @@ async fn get_wallet_details() -> Result<Value, reqwest::Error> {
         .json::<Value>()
         .await?;
 
-    Ok(response)
+    Ok(response["balance"].as_i64().unwrap_or(0).to_string())
+}
+
+// Função para criar uma fatura e retornar o QR Code
+async fn create_invoice(amount: i64, memo: &str) -> Result<String, reqwest::Error> {
+    let client = Client::new();
+    let url = "https://demo.lnbits.com/api/v1/payments";
+    let api_key = "4b63979273164f77ab6df8c7fd68e5ae";
+
+    let params = serde_json::json!({
+        "out": false,
+        "amount": amount,
+        "memo": memo
+    });
+
+    let response = client
+        .post(url)
+        .header("X-Api-Key", api_key)
+        .json(&params)
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    Ok(response["payment_request"].as_str().unwrap_or("").to_string())
 }
 
