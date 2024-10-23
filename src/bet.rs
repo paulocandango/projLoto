@@ -33,6 +33,7 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
     println!("Números escolhidos: {:?}", form.numbers);
 
     // RECUPERA O BALANÇO DA CARTEIRA
+    /*
     let formatted_balance = get_wallet_details().await.unwrap_or_else(|e| {
         println!("Erro ao obter saldo: {}", e);
         "0".to_string()
@@ -40,8 +41,10 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
         .parse::<u64>() // Converte para u64 para formatação
         .unwrap_or(0)
         .to_formatted_string(&Locale::en);
+     */
 
     // GERA A FATURA LIGHTNING
+    /*
     let payment_request = match create_invoice(500, "Aposta LotteryBTC").await {
         Ok(request) => request,
         Err(e) => {
@@ -49,18 +52,18 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
             return actix_web::HttpResponse::InternalServerError().body("Erro ao gerar fatura");
         }
     };
-
     // Gera o QR Code com a fatura Lightning
     let qr_code_base64 = generate_qr_code_base64(&payment_request);
+     */
 
     // Cria o contexto para o template HTML
     let mut context = Context::new();
     context.insert("lottery", &form.lottery);
     context.insert("wallet", &form.wallet);
     context.insert("numbers", &form.numbers);
-    context.insert("qr_code_base64", &qr_code_base64);
-    context.insert("qrcode", &payment_request);
-    context.insert("formatted_balance", &formatted_balance);
+    //context.insert("formatted_balance", &formatted_balance);
+    //context.insert("qr_code_base64", &qr_code_base64);
+    //context.insert("qrcode", &payment_request);
 
     // Renderiza o template HTML com o contexto
     let rendered = tmpl.render("placebet.html", &context).unwrap();
