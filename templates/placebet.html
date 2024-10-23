@@ -31,14 +31,14 @@
         <br />
         <br />
 
-        <div style="text-align: center">
+        <div style="text-align: center" id="divQrCode">
             <h3>QR Code para Pagamento</h3>
-            <img src="{{ qr_code_base64 }}" alt="QR Code de Pagamento" />
-            {# <img src="/static/qrcodeFAKE.jpg" alt="QR Code de Pagamento" /> #}
+            {# <img src="{{ qr_code_base64 }}" alt="QR Code de Pagamento" /> #}
+            <img src="/static/qrcodeFAKE.jpg" alt="QR Code de Pagamento" />
 
             <p><strong>Fatura:</strong></p>
-            <div style="word-break: break-word; overflow-wrap: break-word;">{{ qrcode }}</div>
-            {# <div style="word-break: break-word; overflow-wrap: break-word;">lnbc5u1pn3jzhwsp558rn9zhz26dscvg56xxgjqk9a3vhj84syvlletshr3etnc9e2despp5q7qa8gjdd9jsc5w89hrfxp3dpkvp8539cnjllaylah3epyxsdxgqdqug9cx7um5vysycmm5w3jhy72z23pscqpjrzjq2ucdwlw3myns2gfugeyk3hetpwjx69njqme3ewnwurt45wv9n6x6rx9mcqqfpsqqyqqqqqqqqqqqqqq2q9qxpqysgqjqvt59se40xh6s4x620587tszdynsk2vh0g6cjt07slz5zr7n4w42shu965ns9gs487gyltv020e9x2ljc0zqnwdp7xamcsl6w76qmcqv738dd</div> #}
+            {# <div style="word-break: break-word; overflow-wrap: break-word;">{{ qrcode }}</div> #}
+            <div style="word-break: break-word; overflow-wrap: break-word;">lnbc5u1pn3jzhwsp558rn9zhz26dscvg56xxgjqk9a3vhj84syvlletshr3etnc9e2despp5q7qa8gjdd9jsc5w89hrfxp3dpkvp8539cnjllaylah3epyxsdxgqdqug9cx7um5vysycmm5w3jhy72z23pscqpjrzjq2ucdwlw3myns2gfugeyk3hetpwjx69njqme3ewnwurt45wv9n6x6rx9mcqqfpsqqyqqqqqqqqqqqqqq2q9qxpqysgqjqvt59se40xh6s4x620587tszdynsk2vh0g6cjt07slz5zr7n4w42shu965ns9gs487gyltv020e9x2ljc0zqnwdp7xamcsl6w76qmcqv738dd</div>
         </div>
 
 
@@ -50,7 +50,8 @@
 
 
 <script>
-    const checking_id = "{{checking_id}}"; // Substituído pelo hash dinâmico
+    {# const checking_id = "{{checking_id}}"; #}
+    const checking_id = "fba527992b3ca144c72b460b4b6a1a10c00e9a75bd4d23c7b6672c565f7f615c";
 
     // Variável para armazenar o ID do intervalo
     let intervalId;
@@ -65,8 +66,6 @@
                 const message = await response.text(); // Lê a resposta como texto
 
                 if (message === "Pagamento Confirmado") {
-                    alert(message); // Exibe o alerta
-
                     // Para o intervalo de execução da função
                     clearInterval(intervalId);
 
@@ -75,6 +74,14 @@
                     if (h1Element) {
                         h1Element.innerHTML = "PAGAMENTO CONFIRMADO";
                     }
+                    const divQrCode = document.getElementById("divQrCode").remove();
+                    if (divQrCode) {
+                        divQrCode.remove();
+                    }
+
+
+
+                    alert(message); // Exibe o alerta
                 }
             } else {
                 alert(message); // Exibe o alerta
