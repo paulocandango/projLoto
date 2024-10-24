@@ -46,7 +46,7 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
         driver.get(&url).await?;
 
         // Aguarda para garantir o carregamento completo da página
-        sleep(Duration::from_secs(10)).await;
+        sleep(Duration::from_secs(5)).await;
 
         // Extrai o HTML da página
         let html = driver.page_source().await?;
@@ -77,6 +77,59 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
         } else {
             println!("Erro ao parsear o seletor de elementos: {}", numbers_selector);
         }
+
+        //----------------------------------------------------------------------------------------------------------------------
+        // CONSULTANDO OS GANHADORES
+        //----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Consulta os registros na tabela Bet correspondentes à URL atual
+        println!("--- Buscando apostas para essa URL: {} ---", &url);
+
+        let bet_sql = r#"
+    SELECT b.*
+    FROM Bet b
+    JOIN Lottery l ON b.id_lottery = l.id_lottery
+    WHERE l.results_url = ?
+"#;
+
+        let bets: Vec<Row> = conn.exec(bet_sql, (url.clone(),)).await?;
+
+        // Verifica se a consulta retornou algum registro
+        if bets.is_empty() {
+            println!("Nenhuma aposta encontrada para a URL: {}", url);
+        } else {
+            // Imprime cada linha encontrada na tabela Bet
+            for bet in bets {
+                let id_bet: i64 = bet.get("id_bet").unwrap_or(0);
+                let wallet: String = bet.get("wallet").unwrap_or_default();
+                let numbers: String = bet.get("numbers").unwrap_or_default();
+                let checking_id: String = bet.get("checking_id").unwrap_or_default();
+
+                println!("--- Aposta Encontrada ---");
+                println!("ID da Aposta: {}", id_bet);
+                println!("Carteira: {}", wallet);
+                println!("Números: {}", numbers);
+                println!("Checking ID: {}", checking_id);
+                println!("--------------------------");
+            }
+        }
+
+
+
+
+
 
         // Aguarda antes de continuar para evitar sobrecarga
         sleep(Duration::from_secs(10)).await;
