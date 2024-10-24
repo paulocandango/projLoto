@@ -10,6 +10,7 @@ use qrcode::QrCode;
 use num_format::{Locale, ToFormattedString};
 use serde::Deserialize;
 use std::error::Error as StdError;
+use mysql_async::{prelude::*, Pool, Row};
 
 // Controller para a rota /bet
 pub async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
@@ -180,36 +181,26 @@ pub struct PaymentStatus {
 
 #[derive(Deserialize)]
 pub struct PaymentQuery {
-    pub hash: String,
+    pub checking_id: String,
     pub lottery: String,
     pub wallet: String,
     pub numbers: String,
 }
 
 pub async fn validate_payment(query: web::Query<PaymentQuery>) -> Result<HttpResponse, Box<dyn StdError>> {
-
-    let payment_hash = &query.hash;
-    let lottery = &query.lottery;
-    let wallet = &query.wallet;
-    let numbers = &query.numbers;
+    let PaymentQuery { checking_id, lottery, wallet, numbers } = query.into_inner();
 
     println!("Recebendo dados da requisição:");
-    println!("Hash: {}", payment_hash);
+    println!("checking_id: {}", checking_id);
     println!("Loteria: {}", lottery);
     println!("Carteira: {}", wallet);
     println!("Números: {}", numbers);
 
-    let payment_hash = &query.hash;
-    let api_url = format!("https://demo.lnbits.com/api/v1/payments/{}", payment_hash);
+    let api_url = format!("https://demo.lnbits.com/api/v1/payments/{}", checking_id);
     let api_key = "4b63979273164f77ab6df8c7fd68e5ae";
 
     let client = reqwest::Client::new();
-    match client
-        .get(&api_url)
-        .header("X-Api-Key", api_key)
-        .send()
-        .await
-    {
+    match client.get(&api_url).header("X-Api-Key", api_key).send().await {
         Ok(mut response) => {
             let status = response.status();
             let body = response.text().await.unwrap_or_else(|_| "Erro ao ler corpo".to_string());
@@ -219,6 +210,9 @@ pub async fn validate_payment(query: web::Query<PaymentQuery>) -> Result<HttpRes
             if status.is_success() {
                 if let Ok(json) = from_str::<Value>(&body) {
                     if json.get("paid").and_then(Value::as_bool) == Some(true) {
+                        if let Err(e) = create_new_bet(&checking_id, &lottery, &wallet, &numbers).await {
+                            eprintln!("Erro ao criar aposta: {}", e);
+                        }
                         return Ok(HttpResponse::Ok().body("Pagamento Confirmado"));
                     }
                 }
@@ -232,16 +226,41 @@ pub async fn validate_payment(query: web::Query<PaymentQuery>) -> Result<HttpRes
     Ok(HttpResponse::Ok().body("Aguardando confirmação do pagamento..."))
 }
 
-pub async fn paymentMade(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl Responder {
+pub async fn create_new_bet(
+    checking_id: &str,
+    lottery: &str,
+    wallet: &str,
+    numbers: &str,
+) -> Result<(), Box<dyn StdError>> {
+    println!("Iniciando processo de criação de nova aposta.");
+    println!("checking_id: {}", checking_id);
+    println!("Loteria: {}", lottery);
+    println!("Carteira: {}", wallet);
+    println!("Números: {}", numbers);
 
-    println!("--- Aposta Confirmada ---");
+    let url = "mysql://root:123456@localhost/loto";
+    let pool = Pool::new(url);
+    let mut conn = pool.get_conn().await?;
 
-    let mut context = Context::new();
-    context.insert("variavel", "valor");
+    let sql = "SELECT * FROM Lottery WHERE lottery_name LIKE ? LIMIT 1";
+    let result: Option<Row> = conn.exec_first(sql, (format!("%{}%", lottery),)).await?;
 
-    let rendered = tmpl.render("paymentMade.html", &context).unwrap();
+    if let Some(row) = result {
+        let id_lottery: i64 = row.get("id_lottery").unwrap_or(0);
+        let lottery_name: String = row.get("lottery_name").unwrap_or_default();
 
-    actix_web::HttpResponse::Ok()
-        .content_type("text/html")
-        .body(rendered)
+        println!("Loteria encontrada: ID = {}, Nome = {}", id_lottery, lottery_name);
+
+        let insert_sql = r#"
+            INSERT INTO Bet (id_lottery, wallet, numbers, checking_id)
+            VALUES (?, ?, ?, ?)
+        "#;
+
+        conn.exec_drop(insert_sql, (id_lottery, wallet, numbers, checking_id)).await?;
+        println!("Aposta criada com sucesso!");
+    } else {
+        println!("Nenhuma loteria encontrada para: {}", lottery);
+    }
+
+    Ok(())
 }

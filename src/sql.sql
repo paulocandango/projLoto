@@ -18,13 +18,12 @@ CREATE TABLE Edition (
     CONSTRAINT fk_edition_lottery FOREIGN KEY (id_lottery) REFERENCES Lottery(id_lottery) ON DELETE CASCADE
 );
 
+
 CREATE TABLE Bet (
     id_bet INT AUTO_INCREMENT PRIMARY KEY,              -- ID único e chave primária
     id_lottery INT NOT NULL,                           -- Chave estrangeira que referencia o ID da tabela Lottery
     wallet VARCHAR(255) NOT NULL,                   -- Endereço da carteira Bitcoin
     numbers VARCHAR(255) NOT NULL,                  -- Números escolhidos
-    qr_code_base64 TEXT NOT NULL,                   -- QR Code em formato Base64
-    qrcode VARCHAR(255) NOT NULL,                   -- Código da fatura gerada
     checking_id VARCHAR(255) NOT NULL,              -- ID de verificação do pagamento,
     CONSTRAINT fk_lottery FOREIGN KEY (id_lottery) REFERENCES Lottery(id_lottery) ON DELETE CASCADE
 );

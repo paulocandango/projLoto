@@ -65,7 +65,7 @@
     async function validatePayment() {
         try {
             // Monta a URL com os parâmetros na query string
-            const url = `/validatePayment?hash=${encodeURIComponent(checking_id)}&lottery=${encodeURIComponent(lottery2)}&wallet=${encodeURIComponent(wallet2)}&numbers=${encodeURIComponent(numbers2)}`;
+            const url = `/validatePayment?checking_id=${encodeURIComponent(checking_id)}&lottery=${encodeURIComponent(lottery2)}&wallet=${encodeURIComponent(wallet2)}&numbers=${encodeURIComponent(numbers2)}`;
 
             // Faz a requisição para o backend
             const response = await fetch(url, { method: 'GET' });
