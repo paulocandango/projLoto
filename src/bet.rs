@@ -14,15 +14,49 @@ use mysql_async::{prelude::*, Pool, Row};
 
 // Controller para a rota /bet
 pub async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
-
     let mut context = Context::new();
 
+    // Conexão com o banco de dados
+    let url = "mysql://root:123456@localhost/loto";
+    let pool = Pool::new(url);
+    let mut conn = match pool.get_conn().await {
+        Ok(conn) => conn,
+        Err(e) => {
+            eprintln!("Erro ao conectar ao banco: {:?}", e);
+            return HttpResponse::InternalServerError().body("Erro na conexão com o banco");
+        }
+    };
+
+    // Executa a consulta para obter as loterias
+    let sql = "SELECT lottery_name FROM Lottery WHERE is_dinamic = 1";
+    let lotteries: Vec<Row> = match conn.exec(sql, ()).await {
+        Ok(rows) => rows,
+        Err(e) => {
+            eprintln!("Erro ao executar a consulta: {:?}", e);
+            return HttpResponse::InternalServerError().body("Erro na consulta ao banco");
+        }
+    };
+
+    // Extrai os nomes das loterias e adiciona ao contexto
+    let lottery_names: Vec<String> = lotteries
+        .into_iter()
+        .filter_map(|row| row.get("lottery_name"))
+        .collect();
+    context.insert("lotteries", &lottery_names);
+
     // Renderiza o template usando Tera
-    let rendered = tmpl.render("bet.html", &context).unwrap();
-    // Retorna o HTML renderizado como resposta com o cabeçalho correto
-    actix_web::HttpResponse::Ok()
-        .content_type("text/html") // Define o tipo de conteúdo como HTML
-        .body(rendered) // Adiciona o corpo da resposta
+    let rendered = match tmpl.render("bet.html", &context) {
+        Ok(html) => html,
+        Err(e) => {
+            eprintln!("Erro ao renderizar template: {:?}", e);
+            return HttpResponse::InternalServerError().body("Erro ao renderizar a página");
+        }
+    };
+
+    // Retorna o HTML renderizado como resposta
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(rendered)
 }
 
 

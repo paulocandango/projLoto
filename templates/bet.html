@@ -25,6 +25,9 @@
                 <option value="Brasil - Loto Facil">Brasil - Loto Facil</option>
                 <option value="United States - Power Ball">United States - Power Ball</option>
                 <option value="China - WelFare Lottery">China - WelFare Lottery</option>
+                {% for lottery in lotteries %}
+                    <option value="{{ lottery }}">{{ lottery }}</option>
+                {% endfor %}
             </select>
 
             <div id="number-balls" class="ball-container">
