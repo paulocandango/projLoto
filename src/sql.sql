@@ -1,63 +1,52 @@
-create database loto;
+-- cmd
+-- net start mysql80
 
-use loto;
+CREATE DATABASE loto;
+USE loto;
 
-CREATE TABLE Lottery (
-    id_lottery INT AUTO_INCREMENT PRIMARY KEY,                 -- ID único e chave primária
-    lottery_name VARCHAR(255) NOT NULL,                -- Nome da loteria
-    results_url VARCHAR(255) NOT NULL,                 -- URL publicador dos resultados
-    contest_selector VARCHAR(255) NOT NULL,            -- Seletor identificador do concurso
-    numbers_selector VARCHAR(255) NOT null,             -- Seletor identificador dos elementos sorteados
-    is_dinamic BOOLEAN NOT NULL DEFAULT TRUE
-);
+CREATE TABLE `lottery` (
+  `id_lottery` int NOT NULL AUTO_INCREMENT,
+  `lottery_name` varchar(255) NOT NULL,
+  `results_url` varchar(255) NOT NULL,
+  `contest_selector` varchar(255) NOT NULL,
+  `numbers_selector` varchar(255) NOT NULL,
+  `award_wallet` varchar(255) DEFAULT NULL,
+  `is_dinamic` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_lottery`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-UPDATE Lottery SET is_dinamic = FALSE;
+CREATE TABLE `edition` (
+  `id_edition` int NOT NULL AUTO_INCREMENT,
+  `id_lottery` int NOT NULL,
+  `contest_selected` varchar(255) NOT NULL,
+  `numbers_selected` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_edition`),
+  KEY `fk_edition_lottery` (`id_lottery`),
+  CONSTRAINT `fk_edition_lottery` FOREIGN KEY (`id_lottery`) REFERENCES `lottery` (`id_lottery`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE Edition (
-    id_edition INT AUTO_INCREMENT PRIMARY KEY,   -- ID único e chave primária
-    id_lottery INT NOT NULL,                     -- Chave estrangeira para Lottery
-    contest_selected VARCHAR(255) NOT NULL,      -- Concurso selecionado
-    numbers_selected VARCHAR(255) NOT NULL,      -- Números sorteados
-    CONSTRAINT fk_edition_lottery FOREIGN KEY (id_lottery) REFERENCES Lottery(id_lottery) ON DELETE CASCADE
-);
-
-
-CREATE TABLE Bet (
-    id_bet INT AUTO_INCREMENT PRIMARY KEY,              -- ID único e chave primária
-    id_lottery INT NOT NULL,                           -- Chave estrangeira que referencia o ID da tabela Lottery
-    wallet VARCHAR(255) NOT NULL,                   -- Endereço da carteira Bitcoin
-    numbers VARCHAR(255) NOT NULL,                  -- Números escolhidos
-    checking_id VARCHAR(255) NOT NULL,              -- ID de verificação do pagamento,
-    CONSTRAINT fk_lottery FOREIGN KEY (id_lottery) REFERENCES Lottery(id_lottery) ON DELETE CASCADE
-);
-
-
-ALTER TABLE Bet MODIFY wallet VARCHAR(5000);
-
-
-INSERT INTO Lottery (lottery_name, results_url, contest_selector, numbers_selector)
-VALUES 
-('Mega Sena', 'https://www.megasena.com.br/resultados', '.concurso-id', '.numeros-sorteados'),
-('Lotofacil', 'https://www.lotofacil.com.br/resultados', '#concurso-lotofacil', '.lotofacil-numeros'),
-('Powerball', 'https://www.powerball.com/results', '.pb-concurso-id', '.pb-numeros-sorteados'),
-('Welfare Lottery', 'https://www.cwl.gov.cn/results', '.cwl-concurso-id', '.cwl-numeros-sorteados');
+CREATE TABLE `bet` (
+  `id_bet` int NOT NULL AUTO_INCREMENT,
+  `id_lottery` int NOT NULL,
+  `wallet` varchar(5000) DEFAULT NULL,
+  `numbers` varchar(255) NOT NULL,
+  `checking_id` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_bet`),
+  KEY `fk_lottery` (`id_lottery`),
+  CONSTRAINT `fk_lottery` FOREIGN KEY (`id_lottery`) REFERENCES `lottery` (`id_lottery`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-INSERT INTO Lottery (lottery_name, results_url, contest_selector, numbers_selector)
-VALUES 
-('Loteria1', 'https://www.loteria1.com.br/resultados', '.concurso-id', '.numeros-sorteados'),
-('Loteria2', 'https://www.loteria2.com.br/resultados', '.concurso-id', '.numeros-sorteados'),
-('Loteria3', 'https://www.loteria3.com.br/resultados', '.concurso-id', '.numeros-sorteados');
-
+INSERT INTO loto.lottery (lottery_name,results_url,contest_selector,numbers_selector,award_wallet,is_dinamic) VALUES 
+('Brasil - Mega Sena','http://www.megasena.com.br/resultados','.concurso-id','.numeros-sorteados',NULL,0)
+,('Brasil - Loto Facil','http://www.lotofacil.com.br/resultados','#concurso-lotofacil','.lotofacil-numeros',NULL,0)
+,('United States - Power Ball','http://www.powerball.com/results','.pb-concurso-id','.pb-numeros-sorteados',NULL,0)
+,('China - WelFare Lottery','http://www.cwl.gov.cn/results','.cwl-concurso-id','.cwl-numeros-sorteados',NULL,0)
+,('Bob Loterry','http://localhost:8080/static/example.html','#identity','#elements',NULL,1)
+;
 
 
 SELECT * FROM lottery;
-SELECT * FROM edition;
 SELECT * FROM bet;
-
-
-
-
-
-
+SELECT * FROM edition;
 

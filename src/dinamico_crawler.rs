@@ -53,6 +53,19 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
         let html = driver.page_source().await?;
         let document = Html::parse_document(&html);
 
+        // IDENTIFICADOR DO SORTEIO
+        let contest_selector = if let Ok(contest_selector) = Selector::parse(&contest_selector) {
+            if let Some(resultado) = document.select(&contest_selector).next() {
+                resultado.inner_html()
+            } else {
+                String::new()
+            }
+        } else {
+            String::new()
+        };
+        println!("Identificador do concurso: {}", contest_selector);
+
+        // ELEMENTOS SORTEADOS
         let elementos_texto = if let Ok(elementos_sel) = Selector::parse(&numbers_selector) {
             if let Some(resultado) = document.select(&elementos_sel).next() {
                 resultado.inner_html()
@@ -62,7 +75,6 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
         } else {
             String::new()
         };
-
         println!("Números sorteados: {}", elementos_texto);
 
         let bet_sql = r#"
@@ -100,7 +112,7 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
             }
         }
 
-        sleep(Duration::from_secs(10)).await;
+        sleep(Duration::from_secs(5)).await;
     }
 
     driver.quit().await?;
