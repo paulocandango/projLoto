@@ -32,6 +32,8 @@ CREATE TABLE Bet (
 );
 
 
+ALTER TABLE Bet MODIFY wallet VARCHAR(5000);
+
 
 INSERT INTO Lottery (lottery_name, results_url, contest_selector, numbers_selector)
 VALUES 

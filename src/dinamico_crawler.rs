@@ -6,9 +6,15 @@ use tokio::time::sleep;
 use scraper::{Html, Selector}; // Importa o scraper
 use mysql_async::{prelude::*, Pool, Row};
 use std::error::Error;
+use reqwest::Client; // Adicionando o cliente HTTP
+
+const LN_API_KEY: &str = "1673bd51f74f41e7baeaf290be710009"; // Substitua com sua chave
+
+const LN_API_URL: &str = "https://demo.lnbits.com/api/v1/payments"; // URL da LNBits API
+
 
 pub async fn executar() -> Result<(), Box<dyn Error>> {
-    println!("[CRAWLER] --- DINÂMICO ---");
+    println!("[CRAWLER] --- DINAMICO ---");
 
     // Inicia o geckodriver como um subprocesso
     let mut geckodriver = Command::new("resource/geckodriver.exe")
@@ -41,25 +47,12 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
 
         println!("[CRAWLER] Acessando URL: {}", url);
 
-        // Acessa a URL fornecida
         driver.get(&url).await?;
-        sleep(Duration::from_secs(5)).await; // Aguarda o carregamento
+        sleep(Duration::from_secs(5)).await;
 
-        // Extrai o HTML da página e analisa
         let html = driver.page_source().await?;
         let document = Html::parse_document(&html);
 
-        // Identifica o concurso
-        if let Ok(concurso_sel) = Selector::parse(&contest_selector) {
-            if let Some(resultado) = document.select(&concurso_sel).next() {
-                let concurso_texto = resultado.inner_html();
-                println!("Concurso: {}", concurso_texto);
-            } else {
-                println!("Concurso não encontrado.");
-            }
-        }
-
-        // Recupera e formata os números sorteados
         let elementos_texto = if let Ok(elementos_sel) = Selector::parse(&numbers_selector) {
             if let Some(resultado) = document.select(&elementos_sel).next() {
                 resultado.inner_html()
@@ -72,7 +65,6 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
 
         println!("Números sorteados: {}", elementos_texto);
 
-        // Consulta as apostas relacionadas à URL atual
         let bet_sql = r#"
             SELECT b.*
             FROM Bet b
@@ -82,7 +74,6 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
 
         let bets: Vec<Row> = conn.exec(bet_sql, (url.clone(),)).await?;
 
-        // Verifica e compara os números das apostas
         for bet in bets {
             let id_bet: i64 = bet.get("id_bet").unwrap_or(0);
             let wallet: String = bet.get("wallet").unwrap_or_default();
@@ -96,20 +87,54 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
             println!("Checking ID: {}", checking_id);
             println!("--------------------------");
 
-            // Comparação entre os números sorteados e os apostados
             if comparar_numeros(&elementos_texto, &numbers) {
-                println!("!!! Aposta Vencedora Encontrada !!! ID da Aposta: {}", id_bet);
+                println!("Aposta Vencedora! Efetuando pagamento...");
+
+                // Efetua o pagamento para a carteira vencedora
+                match efetuar_pagamento(&wallet, 100).await {
+                    Ok(_) => println!("Pagamento efetuado com sucesso para a carteira: {}", wallet),
+                    Err(e) => eprintln!("Erro ao efetuar pagamento: {}", e),
+                }
             } else {
                 println!("Aposta não premiada.");
             }
         }
 
-        sleep(Duration::from_secs(10)).await; // Aguarda para evitar sobrecarga
+        sleep(Duration::from_secs(10)).await;
     }
 
-    // Encerra o WebDriver e o geckodriver
     driver.quit().await?;
     let _ = geckodriver.kill();
+
+    Ok(())
+}
+
+async fn efetuar_pagamento(wallet: &str, amount: i64) -> Result<(), Box<dyn Error>> {
+    let client = Client::new();
+
+    let params = serde_json::json!({
+        "out": true,
+        "amount": amount,
+        "memo": "Prêmio da aposta vencedora",
+        "bolt11": wallet
+    });
+
+    let response = client
+        .post(LN_API_URL)
+        .header("X-Api-Key", LN_API_KEY)
+        .json(&params)
+        .send()
+        .await?;
+
+    // Captura o status antes de consumir o corpo da resposta
+    let status = response.status();
+    let body = response.text().await.unwrap_or_else(|_| "Erro desconhecido".to_string());
+
+    if status.is_success() {
+        println!("Pagamento efetuado com sucesso para: {}", wallet);
+    } else {
+        eprintln!("Erro no pagamento: {} - {}", status, body);
+    }
 
     Ok(())
 }
