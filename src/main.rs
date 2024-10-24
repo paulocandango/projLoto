@@ -2,6 +2,7 @@ mod mega_sena_crawler;
 mod loto_facil_crawler;
 mod power_ball_crawler;
 mod china_welfare_crawler;
+mod dinamico_crawler;
 mod setup;
 mod bet;
 
@@ -16,7 +17,7 @@ async fn main() {
     println!("--- INICIANDO A EXECUÇÃO DA MAIN ----");
 
     // 2. Agenda a execução da função `update_crawlers` a cada 5 segundos
-    let mut intervalo = time::interval(Duration::from_secs(10*60));
+    let mut intervalo = time::interval(Duration::from_secs(1*60));
 
     // 3. Iniciar o servidor HTTP antes do loop
     println!("--- INICIANDO SERVIDOR HTTP ---");
@@ -43,6 +44,7 @@ async fn update_crawlers() {
     //loto_facil_crawler::executar().await;
     //power_ball_crawler::executar().await;
     //china_welfare_crawler::executar().await;
+    dinamico_crawler::executar().await;
 }
 
 // Função para inicializar o servidor HTTP
