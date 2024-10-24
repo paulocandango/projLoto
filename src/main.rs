@@ -17,7 +17,7 @@ async fn main() {
     println!("--- INICIANDO A EXECUÇÃO DA MAIN ----");
 
     // 2. Agenda a execução da função `update_crawlers` a cada 5 segundos
-    let mut intervalo = time::interval(Duration::from_secs(1*60));
+    let mut intervalo = time::interval(Duration::from_secs(5*60));
 
     // 3. Iniciar o servidor HTTP antes do loop
     println!("--- INICIANDO SERVIDOR HTTP ---");
@@ -40,10 +40,10 @@ async fn main() {
 // Função que imprime um log quando é executada
 async fn update_crawlers() {
     println!("--- Executando update_crawlers ----");
-    //mega_sena_crawler::executar().await;
-    //loto_facil_crawler::executar().await;
-    //power_ball_crawler::executar().await;
-    //china_welfare_crawler::executar().await;
+    mega_sena_crawler::executar().await;
+    loto_facil_crawler::executar().await;
+    power_ball_crawler::executar().await;
+    china_welfare_crawler::executar().await;
     dinamico_crawler::executar().await;
 }
 
