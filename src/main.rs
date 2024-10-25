@@ -28,7 +28,7 @@ async fn main() {
     println!("Conectando ao banco de dados em: {}", url.as_str());
 
     // 2. Agenda a execução da função `update_crawlers` a cada 5 segundos
-    let mut intervalo = time::interval(Duration::from_secs(5*60));
+    let mut intervalo = time::interval(Duration::from_secs(1*60));
 
     // 3. Iniciar o servidor HTTP antes do loop
     println!("--- INICIANDO SERVIDOR HTTP ---");
