@@ -1,5 +1,6 @@
 -- cmd
 -- net start mysql80
+-- net stop mysql80
 
 CREATE DATABASE loto;
 USE loto;

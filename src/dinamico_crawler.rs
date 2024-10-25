@@ -1,3 +1,4 @@
+use std::env;
 use std::process::Command;
 use std::time::Duration;
 use thirtyfour::{DesiredCapabilities, WebDriver};
@@ -6,6 +7,7 @@ use tokio::time::sleep;
 use scraper::{Html, Selector}; // Importa o scraper
 use mysql_async::{prelude::*, Pool, Row};
 use std::error::Error;
+use dotenvy::dotenv;
 use reqwest::Client; // Adicionando o cliente HTTP
 
 const LN_API_KEY: &str = "1673bd51f74f41e7baeaf290be710009"; // Substitua com sua chave
@@ -31,8 +33,8 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
     let driver = WebDriver::new("http://127.0.0.1:4444", caps).await?;
 
     // Conexão com o banco de dados
-    let url = "mysql://root:123456@localhost/loto";
-    let pool = Pool::new(url);
+    let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
+    let pool = Pool::new(url.as_str());
     let mut conn = pool.get_conn().await?;
 
     // Consulta os sites dinâmicos e seus seletores
@@ -41,13 +43,13 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
 
     // Itera sobre cada resultado da consulta
     for row in results {
-        let url: String = row.get("results_url").unwrap_or_default();
+        let results_url: String = row.get("results_url").unwrap_or_default();
         let contest_selector: String = row.get("contest_selector").unwrap_or_default();
         let numbers_selector: String = row.get("numbers_selector").unwrap_or_default();
 
-        println!("[CRAWLER] Acessando URL: {}", url);
+        println!("[CRAWLER] Acessando URL: {}", results_url);
 
-        driver.get(&url).await?;
+        driver.get(&results_url).await?;
         sleep(Duration::from_secs(5)).await;
 
         let html = driver.page_source().await?;

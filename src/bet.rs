@@ -1,3 +1,4 @@
+use std::env;
 use actix_web::{web, Responder, HttpResponse, Error};
 use tera::{Tera, Context};
 use crate::{parse_numbers, BetForm};
@@ -17,8 +18,9 @@ pub async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
     let mut context = Context::new();
 
     // Conexão com o banco de dados
-    let url = "mysql://root:123456@localhost/loto";
-    let pool = Pool::new(url);
+    let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
+    println!("url: {}", url);
+    let pool = Pool::new(url.as_str());
     let mut conn = match pool.get_conn().await {
         Ok(conn) => conn,
         Err(e) => {
@@ -272,8 +274,8 @@ pub async fn create_new_bet(
     println!("Carteira: {}", wallet);
     println!("Números: {}", numbers);
 
-    let url = "mysql://root:123456@localhost/loto";
-    let pool = Pool::new(url);
+    let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
+    let pool = Pool::new(url.as_str());
     let mut conn = pool.get_conn().await?;
 
     let sql = "SELECT * FROM Lottery WHERE lottery_name LIKE ? LIMIT 1";

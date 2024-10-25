@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::env;
 use actix_web::{web, Responder, HttpResponse};
 use tera::{Tera, Context};
 use mysql_async::{Pool, prelude::*};
@@ -28,8 +29,9 @@ pub async fn setup(tmpl: web::Data<Tera>) -> impl Responder {
 
 // Função para buscar os dados da tabela
 async fn fetch_lottery_data() -> Result<Vec<(String, String, String, String)>, Box<dyn std::error::Error>> {
-    let url = "mysql://root:123456@localhost/loto";
-    let pool = Pool::new(url);
+
+    let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
+    let pool = Pool::new(url.as_str());
     let mut conn = pool.get_conn().await?;
     let result: Vec<(String, String, String, String)> = conn
         .query("SELECT lottery_name, results_url, contest_selector, numbers_selector FROM Lottery")
@@ -50,8 +52,9 @@ pub async fn delete_lottery(form: web::Form<HashMap<String, String>>) -> impl Re
 
 // Função que executa o DELETE no banco de dados
 async fn delete_lottery_by_name(lottery_name: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let url = "mysql://root:123456@localhost/loto";
-    let pool = Pool::new(url);
+
+    let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
+    let pool = Pool::new(url.as_str());
     let mut conn = pool.get_conn().await?;
 
     // Executa o DELETE
@@ -95,8 +98,8 @@ async fn insert_lottery(
     contest_selector: &str,
     numbers_selector: &str
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let url = "mysql://root:123456@localhost/loto";
-    let pool = Pool::new(url);
+    let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
+    let pool = Pool::new(url.as_str());
     let mut conn = pool.get_conn().await?;
 
     // Executa o INSERT

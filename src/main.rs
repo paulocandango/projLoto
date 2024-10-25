@@ -6,15 +6,26 @@ mod dinamico_crawler;
 mod setup;
 mod bet;
 
+use std::env;
 use tokio::time::{self, Duration};
 use actix_web::{web, App, HttpServer, Responder};
 use tera::{Tera, Context};
-use actix_files as fs; // Para servir arquivos estáticos
+use actix_files as fs;
+use dotenvy::dotenv;
+use mysql_async::Opts;
+// Para servir arquivos estáticos
 
 #[actix_web::main]
 async fn main() {
     // 1. Imprime um log quando começa a executar
     println!("--- INICIANDO A EXECUÇÃO DA MAIN ----");
+
+    // Carrega as variáveis do arquivo .env
+    dotenv().ok();
+
+    // Lê a variável MYSQL_URL do ambiente
+    let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
+    println!("Conectando ao banco de dados em: {}", url.as_str());
 
     // 2. Agenda a execução da função `update_crawlers` a cada 5 segundos
     let mut intervalo = time::interval(Duration::from_secs(5*60));
@@ -40,10 +51,10 @@ async fn main() {
 // Função que imprime um log quando é executada
 async fn update_crawlers() {
     println!("--- Executando update_crawlers ----");
-    mega_sena_crawler::executar().await;
-    loto_facil_crawler::executar().await;
-    power_ball_crawler::executar().await;
-    china_welfare_crawler::executar().await;
+    //mega_sena_crawler::executar().await;
+    //loto_facil_crawler::executar().await;
+    //power_ball_crawler::executar().await;
+    //china_welfare_crawler::executar().await;
     dinamico_crawler::executar().await;
 }
 
@@ -75,8 +86,6 @@ async fn start_server() -> std::io::Result<()> {
 // Controller para a rota /
 async fn index(tmpl: web::Data<Tera>) -> impl Responder {
     let mut context = Context::new();
-    let nome_pessoa = "Paulo".to_string(); // Define a variável com o nome
-    context.insert("nome_pessoa", &nome_pessoa); // Insere a variável no contexto
 
     // Renderiza o template usando Tera
     let rendered = tmpl.render("index.html", &context).unwrap();
