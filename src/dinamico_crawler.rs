@@ -15,110 +15,125 @@ const LN_API_URL: &str = "https://demo.lnbits.com/api/v1/payments"; // URL da LN
 
 
 pub async fn executar() -> Result<(), Box<dyn Error>> {
+
     println!("[CRAWLER] --- DINAMICO ---");
 
-    // Inicia o geckodriver como um subprocesso
-    let mut geckodriver = Command::new("resource/geckodriver.exe")
-        .arg("--port")
-        .arg("4444")
-        .spawn()
-        .expect("Falha ao iniciar o geckodriver");
+    let result = async {
 
-    // Configura as capacidades do Firefox
-    let mut caps = DesiredCapabilities::firefox();
-    caps.set_firefox_binary("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
+        // Inicia o geckodriver como um subprocesso
+        let mut geckodriver = Command::new("resource/geckodriver.exe")
+            .arg("--port")
+            .arg("4444")
+            .spawn()
+            .expect("Falha ao iniciar o geckodriver");
 
-    // Inicia o WebDriver
-    let driver = WebDriver::new("http://127.0.0.1:4444", caps).await?;
+        // Configura as capacidades do Firefox
+        let mut caps = DesiredCapabilities::firefox();
+        caps.set_firefox_binary("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
 
-    // Conexão com o banco de dados
-    let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
-    println!("url: {}", url);
-    let pool = Pool::new(url.as_str());
-    let mut conn = pool.get_conn().await?;
+        // Inicia o WebDriver
+        let driver = WebDriver::new("http://127.0.0.1:4444", caps).await?;
 
-    // Consulta os sites dinâmicos e seus seletores
-    let sql = "SELECT results_url, contest_selector, numbers_selector FROM Lottery WHERE is_dinamic = 1";
-    let results: Vec<Row> = conn.exec(sql, ()).await?;
+        // Conexão com o banco de dados
+        let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
+        println!("url: {}", url);
+        let pool = Pool::new(url.as_str());
+        let mut conn = pool.get_conn().await?;
 
-    // Itera sobre cada resultado da consulta
-    for row in results {
-        let url: String = row.get("results_url").unwrap_or_default();
-        let contest_selector: String = row.get("contest_selector").unwrap_or_default();
-        let numbers_selector: String = row.get("numbers_selector").unwrap_or_default();
+        // Consulta os sites dinâmicos e seus seletores
+        let sql = "SELECT results_url, contest_selector, numbers_selector FROM Lottery WHERE is_dinamic = 1";
+        let results: Vec<Row> = conn.exec(sql, ()).await?;
 
-        println!("[CRAWLER] Acessando URL: {}", url);
+        // Itera sobre cada resultado da consulta
+        for row in results {
+            let url: String = row.get("results_url").unwrap_or_default();
+            let contest_selector: String = row.get("contest_selector").unwrap_or_default();
+            let numbers_selector: String = row.get("numbers_selector").unwrap_or_default();
 
-        driver.get(&url).await?;
-        sleep(Duration::from_secs(5)).await;
+            println!("[CRAWLER] Acessando URL: {}", url);
 
-        let html = driver.page_source().await?;
-        let document = Html::parse_document(&html);
+            driver.get(&url).await?;
+            sleep(Duration::from_secs(5)).await;
 
-        // Recuperando o ID do concurso
-        let concurso_selector = Selector::parse(contest_selector.as_str()).unwrap();
-        if let Some(resultado) = document.select(&concurso_selector).next() {
-            // Captura o texto do concurso
-            let concurso_texto = resultado.inner_html(); // ou use resultado.text() para pegar apenas o texto sem HTML
-            println!("IDENTIFICADOR DO CONCURSO: {}", concurso_texto);
-        } else {
-            println!("Resultado não encontrado.");
-        }
+            let html = driver.page_source().await?;
+            let document = Html::parse_document(&html);
 
-        // Recuperando os ELEMENTOS sorteados
-        let elementos_texto = if let Ok(elementos_sel) = Selector::parse(&numbers_selector) {
-            if let Some(resultado) = document.select(&elementos_sel).next() {
-                resultado.inner_html()
+            // Recuperando o ID do concurso
+            let concurso_selector = Selector::parse(contest_selector.as_str()).unwrap();
+            if let Some(resultado) = document.select(&concurso_selector).next() {
+                // Captura o texto do concurso
+                let concurso_texto = resultado.inner_html(); // ou use resultado.text() para pegar apenas o texto sem HTML
+                println!("IDENTIFICADOR DO CONCURSO: {}", concurso_texto);
             } else {
-                String::new()
+                println!("Resultado não encontrado.");
             }
-        } else {
-            String::new()
-        };
-        println!("Números sorteados: {}", elementos_texto);
 
-        let bet_sql = r#"
-            SELECT b.*
-            FROM Bet b
-            JOIN Lottery l ON b.id_lottery = l.id_lottery
-            WHERE l.results_url = ?
-        "#;
-
-        let bets: Vec<Row> = conn.exec(bet_sql, (url.clone(),)).await?;
-
-        for bet in bets {
-            let id_bet: i64 = bet.get("id_bet").unwrap_or(0);
-            let wallet: String = bet.get("wallet").unwrap_or_default();
-            let numbers: String = bet.get("numbers").unwrap_or_default();
-            let checking_id: String = bet.get("checking_id").unwrap_or_default();
-
-            println!("--- Aposta Encontrada ---");
-            println!("ID da Aposta: {}", id_bet);
-            println!("Carteira: {}", wallet);
-            println!("Números da Aposta: {}", numbers);
-            println!("Checking ID: {}", checking_id);
-            println!("--------------------------");
-
-            if comparar_numeros(&elementos_texto, &numbers) {
-                println!("Aposta Vencedora! Efetuando pagamento...");
-
-                // Efetua o pagamento para a carteira vencedora
-                match efetuar_pagamento(&wallet, 100).await {
-                    Ok(_) => println!("Pagamento efetuado com sucesso para a carteira: {}", wallet),
-                    Err(e) => eprintln!("Erro ao efetuar pagamento: {}", e),
+            // Recuperando os ELEMENTOS sorteados
+            let elementos_texto = if let Ok(elementos_sel) = Selector::parse(&numbers_selector) {
+                if let Some(resultado) = document.select(&elementos_sel).next() {
+                    resultado.inner_html()
+                } else {
+                    String::new()
                 }
             } else {
-                println!("Aposta não premiada.");
+                String::new()
+            };
+            println!("Números sorteados: {}", elementos_texto);
+
+            // RECUPERANDO APOSTAS FEITAS PARA ESSA LOTERIA
+            let bet_sql = r#"
+                SELECT b.*
+                FROM Bet b
+                JOIN Lottery l ON b.id_lottery = l.id_lottery
+                WHERE l.results_url = ?
+            "#;
+
+            let bets: Vec<Row> = conn.exec(bet_sql, (url.clone(),)).await?;
+
+            for bet in bets {
+                let id_bet: i64 = bet.get("id_bet").unwrap_or(0);
+                let wallet: String = bet.get("wallet").unwrap_or_default();
+                let numbers: String = bet.get("numbers").unwrap_or_default();
+                let checking_id: String = bet.get("checking_id").unwrap_or_default();
+
+                println!("--- Aposta Encontrada ---");
+                println!("ID da Aposta: {}", id_bet);
+                println!("Carteira: {}", wallet);
+                println!("Números da Aposta: {}", numbers);
+                println!("Checking ID: {}", checking_id);
+                println!("--------------------------");
+
+                if comparar_numeros(&elementos_texto, &numbers) {
+                    println!("Aposta Vencedora! Efetuando pagamento...");
+
+                    // Efetua o pagamento para a carteira vencedora
+                    match efetuar_pagamento(&wallet, 100).await {
+                        Ok(_) => println!("Pagamento efetuado com sucesso para a carteira: {}", wallet),
+                        Err(e) => eprintln!("Erro ao efetuar pagamento: {}", e),
+                    }
+                } else {
+                    println!("Aposta não premiada.");
+                }
             }
+
+            sleep(Duration::from_secs(10)).await;
         }
 
-        sleep(Duration::from_secs(10)).await;
+        driver.quit().await?;
+        let _ = geckodriver.kill();
+
+        Ok::<(), Box<dyn Error>>(())
+    }.await;
+    match result {
+        Ok(_) => {
+            println!("[CRAWLER] --- DINAMICO --- EXECUTADO COM SUCESSO!");
+            Ok(())
+        }
+        Err(e) => {
+            eprintln!("[CRAWLER] --- DINAMICO --- EXECUTADO COM Erro: {}", e);
+            Ok(())
+        }
     }
-
-    driver.quit().await?;
-    let _ = geckodriver.kill();
-
-    Ok(())
 }
 
 async fn efetuar_pagamento(wallet: &str, amount: i64) -> Result<(), Box<dyn Error>> {
