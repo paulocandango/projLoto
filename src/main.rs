@@ -28,7 +28,7 @@ async fn main() {
     println!("Conectando ao banco de dados em: {}", url.as_str());
 
     // 2. Agenda a execução da função `update_crawlers` a cada 5 segundos
-    let mut intervalo = time::interval(Duration::from_secs(1*60));
+    let mut intervalo = time::interval(Duration::from_secs(3*60));
 
     // 3. Iniciar o servidor HTTP antes do loop
     println!("--- INICIANDO SERVIDOR HTTP ---");
@@ -50,7 +50,10 @@ async fn main() {
 
 // Função que imprime um log quando é executada
 async fn update_crawlers() {
-    println!("--- Executando update_crawlers ----");
+    //println!("--- CRAWLERS DISABLED - DISABLED CRAWLERS ----");
+    println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
+    println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
+    println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
     //mega_sena_crawler::executar().await;
     //loto_facil_crawler::executar().await;
     //power_ball_crawler::executar().await;

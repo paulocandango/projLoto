@@ -55,6 +55,17 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
         let html = driver.page_source().await?;
         let document = Html::parse_document(&html);
 
+        // Recuperando o ID do concurso
+        let concurso_selector = Selector::parse(contest_selector.as_str()).unwrap();
+        if let Some(resultado) = document.select(&concurso_selector).next() {
+            // Captura o texto do concurso
+            let concurso_texto = resultado.inner_html(); // ou use resultado.text() para pegar apenas o texto sem HTML
+            println!("IDENTIFICADOR DO CONCURSO: {}", concurso_texto);
+        } else {
+            println!("Resultado não encontrado.");
+        }
+
+        // Recuperando os ELEMENTOS sorteados
         let elementos_texto = if let Ok(elementos_sel) = Selector::parse(&numbers_selector) {
             if let Some(resultado) = document.select(&elementos_sel).next() {
                 resultado.inner_html()
@@ -64,7 +75,6 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
         } else {
             String::new()
         };
-
         println!("Números sorteados: {}", elementos_texto);
 
         let bet_sql = r#"
