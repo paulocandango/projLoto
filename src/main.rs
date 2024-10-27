@@ -19,14 +19,12 @@ use mysql_async::Opts;
 
 #[actix_web::main]
 async fn main() {
+
     // 1. Imprime um log quando começa a executar
     println!("--- INICIANDO A EXECUÇÃO DA MAIN ----");
 
     // Carrega as variáveis do arquivo .env
     dotenv().ok();
-
-
-
 
     // Lê a variável MYSQL_URL do ambiente
     let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
@@ -83,14 +81,14 @@ async fn start_mysql_service() -> Result<(), io::Error> {
 
 // Função que imprime um log quando é executada
 async fn update_crawlers() {
-    //println!("--- CRAWLERS DISABLED - DISABLED CRAWLERS ----");
+    println!("--- CRAWLERS DISABLED - DISABLED CRAWLERS ----");
     println!("--- VISIT http://localhost:8080/ ----");
     println!("--- VISIT http://localhost:8080/setup ----");
     println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
     mega_sena_crawler::executar().await;
-    //loto_facil_crawler::executar().await;
-    //power_ball_crawler::executar().await;
-    //china_welfare_crawler::executar().await;
+    loto_facil_crawler::executar().await;
+    power_ball_crawler::executar().await;
+    china_welfare_crawler::executar().await;
     dinamico_crawler::executar().await;
 }
 
@@ -113,7 +111,7 @@ async fn start_server() -> std::io::Result<()> {
             .route("/placeBet", web::post().to(bet::place_bet))
             .route("/validatePayment", web::get().to(bet::validate_payment))
     })
-        .bind("127.0.0.1:8080")?
+        .bind("0.0.0.0:80")?
         .run()
         .await
 }
@@ -140,7 +138,6 @@ struct BetForm {
     wallet: String,
     numbers: String,
 }
-
 
 
 fn parse_numbers(numbers_str: &str) -> Vec<i32> {

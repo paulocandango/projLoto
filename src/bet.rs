@@ -1,7 +1,7 @@
 use std::env;
 use actix_web::{web, Responder, HttpResponse, Error};
 use tera::{Tera, Context};
-use crate::{parse_numbers, BetForm};
+use crate::{BetForm};
 use reqwest::Client;
 use serde_json::{from_str, Value};
 use base64::encode;
