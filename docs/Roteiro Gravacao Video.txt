@@ -1,0 +1,146 @@
+
+
+
+
+1 - SOLUÇÃO FINANCEIRA PARA
+
+	1 - ARRECADAÇÃO DE FUNDOS
+	2 - IDENTIFICAÇÃO DE GANHADORES
+	3 - PAGAMENTO AUTOMÁTICO DE PRÊMIOS
+
+
+
+
+
+	
+2 - 
+
+	- Plataforma de Apostas descentralizadas usando Bitcoin
+	- Captura automática dos resultados oficiais das loterias
+	- Pagamentos automatizados em BTC
+	- Apostas seguras e anônimas
+	
+
+
+
+
+	
+3 - RESOLVENDO OS PROBLEMAS
+
+	1 - Proibição e excesso de regulação governamental.
+	2 - Fragilidade no anônimato
+	3 - Fraude nas loterias
+	4 - Dificuldades em receber os prêmios
+	
+	
+	
+	
+4 - PROPOSTA DE SOLUÇÃO
+
+	1 - As Casas de Aposta se COMPROMETEM RODAR O LOTTERY BTC
+	
+	2 - LotteryBTC fornece aos apostadores UM SERVIÇO DE APOSTAS ONLINE
+	
+	3 - O LotteryBTC AGENDA a execução periódica do WebCrawler.
+	
+	4 - O WebCrawler visita periodicamente as páginas de apostas configuradas.
+	
+	5 - O Crawler identifica apostas vencedoras e paga as carteiras informadas no momento do registro da aposta.
+	
+	
+	
+	
+	
+	
+5 - PAPEL DAS CASA DE APOSTAS
+
+	1 - Lottery BTC fornece uma interface simples para administração das loterias
+	2 - A casa de apostas Cadastra ou CONFIGURA AS LOTERIAS DISPONÍVEIS
+	
+PRÓXIMO
+	
+	3 - Informando o site onde será divulgado o resultado do sorteio e os seletores CSS que idenficam esses campos nas páginas
+	
+PRÓXIMO
+	
+	4 - Loterias famosas também pode fazer parte desse processo.
+	
+PRÓXIMO
+	
+6 - PAPEL APOSTADORES
+
+	1 - O Apostador escolhe a loteria que quer concorrer.
+	
+	2 - Escolhe os números ou elementos que quer aposta.
+	
+PRÓXIMO
+	
+	3 - O Lottery BTC fornece uma interface simples de arrecadação de fundos para este evento, possibilitando o pagamento da aposta via Lightning
+	
+PRÓXIMO
+	
+	4 - PAGAMENTOS SÃO CONFIRMADOS AUTOMÁTICAMENTE
+	
+PRÓXIMO
+	
+7 - PAPEL WEB CRAWLER
+
+	1 - Os crawlers são responsáveis por visitar periodicamente as páginas das loterias.
+	
+	2 - Reconhecem o concurso e os números sorteados.
+	
+PRÓXIMO
+
+		Identificando uma aposta ganhadora.
+		O Crawler faz o pagamento automáticamente para o endereço cadastrado na aposta.
+	
+8 - QUALQUER SITE PODE SER COMO FONTE DE DADOS
+
+	jogo do bicho, tigrinho e até sites de noticias.
+	
+	Um apostador poderia apostar por exemplo qual seria a manchete da CNN em uma data específica.
+
+PRÓXIMO
+
+	RESPEITOSAMENTE apresento esse exemplo.
+	
+	2 - Cadastrado uma página de obituário como fonte de dados.
+	
+	3 - O Crawler visita essa página e identifica os elementos.
+	
+	4 - CASO FOSSE FORNECIDO na tela de apostas um nomes ao invés de números. O Crawler poderia pagar a carteira de quem informou esse mesmo nome no momento da aposta.
+	
+	
+	
+	
+9 - EVOLUÇÕES
+
+	3 - CHAVE DE PAGAMENTOS CRIPTOGRAFADA NO CRAWLER
+		
+		Se fosse criado um modelo onde parte da chave ficasse criptografada no Crawler e outra parte fosse desbloqueada pelos números sorteados.
+		
+		Qualquer apostador poderia rodar o Crawler e obrigar o pagamento de todas as apostas.
+ 
+
+
+
+
+http://localhost:8080/static/example.html
+
+#identity
+
+#elements
+
+
+lnbc1u1pn3uvkhsp504qsaryhn0420w4q9ekzw94rau4hrme7ym33ksvnjv58jv389a6spp55fstvln5mdq0akh8ew7qndcerzczwqsdnsazhgw7czuh45d6kxhsdpqf38xy6t5wvszs3z9f48jq5692fty253fcqpjrzjqw6lfdpjecp4d5t0gxk5khkrzfejjxyxtxg5exqsd95py6rhwwh72rpgrgqq3hcqqgqqqqlgqqqqqqgq9q9qxpqysgqqs343vn4st744zpwfg9jpv329pgseh0lmgtdh635hfnzxxm3t5f3gwhmjxytja8h7ulrpxlhhjky2dj99tlzvzaswvs7cqmars9aq3cpsndpr5
+
+
+
+
+lnbc1u1pn3uvh5sp5rl5kw002cq0gtk5qv20qcmtp28mqtxy9en4qctrjvcxp3vnqjjrqpp5xewtz8u4mdslupdvvz9v3hcyauea4yqhvp5z9cepgasz7wfg7v6qdpqf38xy6t5wvszs3z9f48jq5692fty253fcqpjrzjqgf6qpltkwzrzs7dnrjh3lsstk7v4ha9yq5ypw75hqed3nwk8g55vrg2yqqqnssqqyqqqqqqqqqqq7qq2q9qxpqysgqzxh78ulwpmv7jhl2mdn2zc7ga95jkvxa0zf28lhj63f0mfr3t2r3uycnvs9vd6xe5gnkshn97sff37q4zsh3hnn954luw8h3xzssllqqaj2sx4
+
+
+
+
+
+lnbc1u1pn3uvhasp5amnvpxu6k82p87dxzx3f9pxer78t223qnac4qaw58kjlsct7eevspp5qf60gu67uqnjwwx6yuzmume3quaatdll4z2585p9e2w39rlkfn4qdpqf38xy6t5wvszs3z9f48jq5692fty253fcqpjrzjqtty6qedwtvzdv9najlrt8c3yd5et27jfyd4s6xq40l59aaqxfafqrptd5qq84sqqyqqqqqqqqqqqvsq9q9qxpqysgqxgzgw6qup349lpmwctsc34szeh4zgrfgtst0ezw2fxv7t75mujpyjucy7q8c0tly9sav5et239fjq6x9pqx6q2emql04sp5sjd335kqqrsxtnu

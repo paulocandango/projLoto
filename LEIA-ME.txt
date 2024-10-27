@@ -1,0 +1,28 @@
+1 - Baixe tudo que está no repositório "GITHUB/projLoto"
+    1.1 - Clone o repositório do git obrigatoriamente para o diretorio local "C:\DevEnvSetup\projLoto"
+
+2 - É obrigatório ter o Mozila Firefox instalado para rodar o Crawler
+    2.1 - Instale o "Firefox Installer.exe" obrigatóriamente no diretório:
+			"C:\\Program Files\\Mozilla Firefox\\firefox.exe"
+
+3 - É obrigatório ter uma instância do MySql rodando em sua máquina
+    3.1 - Instale o "mysql-installer-community-8.0.40.0.msi" completo.
+    3.2 - Configure o nome de usuário como root e a senha como 123456.
+    3.3 - Caso seja definido outro usuário ou senha, edite o arquivo .env com seu usuario e senha
+			"C:\DevEnvSetup\projLoto\.env"
+
+4 - Crie o banco de dados 'loto' e suas tabelas.
+    4.1 - Conecte-se com seu banco de dados local
+			(se precisar de um driver para MySQL,
+			ele está em "C:\DevEnvSetup\projLoto\resource\mysql-connector-j-9.0.0.jar")
+	4.2 - Execute todo o script escrito em "C:\DevEnvSetup\projLoto\sql.sql"
+			Por exemplo: CREATE DATABASE loto; ... etc...
+			
+5 - Execute o programa LotteryBTC.exe.
+	5.1 - Com tudo configurado até aqui você pode abrir o programa:
+			"C:\DevEnvSetup\projLoto\projLoto-WEB-SERVER-ONLY.exe"
+		e acessar os links:
+			http://localhost:8080/
+			http://localhost:8080/setup
+			http://localhost:8080/bet
+

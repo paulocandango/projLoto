@@ -3,6 +3,7 @@
 -- net stop mysql80
 
 CREATE DATABASE loto;
+
 USE loto;
 
 CREATE TABLE `lottery` (
