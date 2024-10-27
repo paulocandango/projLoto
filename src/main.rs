@@ -12,6 +12,8 @@ use actix_web::{web, App, HttpServer, Responder};
 use tera::{Tera, Context};
 use actix_files as fs;
 use dotenvy::dotenv;
+
+use std::process::Command;
 use mysql_async::Opts;
 // Para servir arquivos estáticos
 
@@ -23,9 +25,21 @@ async fn main() {
     // Carrega as variáveis do arquivo .env
     dotenv().ok();
 
+
+
+
     // Lê a variável MYSQL_URL do ambiente
     let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
     println!("Conectando ao banco de dados em: {}", url.as_str());
+    println!("VOCÊ PRECISA ESTAR RODANDO UM MYSQL COM ESSA CONFIGURACAO: {}", url.as_str());
+    println!("YOU NEED RUN MYSQL WITH AS CONFIGURATION: {}", url.as_str());
+
+    if let Err(e) = start_mysql_service().await {
+        eprintln!("Erro ao iniciar o serviço MySQL: {}", e);
+        println!(" LEIA O ARQUIVO LEIA-ME.TXT");
+        println!(" READ FILE LEIA-ME.TXT");
+        return;
+    }
 
     // 2. Agenda a execução da função `update_crawlers` a cada 5 segundos
     let mut intervalo = time::interval(Duration::from_secs(3*60));
@@ -48,6 +62,21 @@ async fn main() {
 
 }
 
+
+async fn start_mysql_service() -> Result<(), std::io::Error> {
+    println!("Iniciando serviço MySQL...");
+    let status = Command::new("cmd")
+        .args(["/C", "net start mysql80"]) // Executa o comando no Windows
+        .status()?;
+
+    if status.success() {
+        println!("Serviço MySQL iniciado com sucesso.");
+        Ok(())
+    } else {
+        Ok(())
+    }
+}
+
 // Função que imprime um log quando é executada
 async fn update_crawlers() {
     //println!("--- CRAWLERS DISABLED - DISABLED CRAWLERS ----");
@@ -55,9 +84,9 @@ async fn update_crawlers() {
     println!("--- VISIT http://localhost:8080/setup ----");
     println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
     mega_sena_crawler::executar().await;
-    loto_facil_crawler::executar().await;
-    power_ball_crawler::executar().await;
-    china_welfare_crawler::executar().await;
+    //loto_facil_crawler::executar().await;
+    //power_ball_crawler::executar().await;
+    //china_welfare_crawler::executar().await;
     dinamico_crawler::executar().await;
 }
 
