@@ -1,0 +1,48 @@
+1. Servidor HTTP e Controllers:
+
+Actix Web: Continua sendo a melhor escolha para alta performance e escalabilidade no backend em Rust.
+
+2. Views e Templates:
+
+Tera: Mantenho como sistema de templates para renderizar HTML, fácil de usar e amplamente adotado.
+
+3. Persistência e Banco de Dados:
+
+Diesel: ORM robusto para trabalhar com bancos de dados relacionais. O banco de dados mais comum para esse tipo de projeto seria PostgreSQL, conhecido por sua performance e recursos avançados.
+
+4. Web Scraping:
+
+thirtyfour: Biblioteca Rust para automação de browsers (bindings do Selenium), necessária para carregar páginas que executam JavaScript. Isso resolverá o problema do carregamento assíncrono dos números da Mega-Sena.
+
+
+5. Cronjobs:
+
+Job Scheduler: Permite o agendamento e execução de tarefas como scraping em intervalos específicos.
+
+6. Integração com Lightning Network:
+
+rust-lightning: Mantém-se como a biblioteca para implementar pagamentos via Lightning Network.
+
+7. Gerenciamento de Pacotes e Builds:
+
+Cargo: O gerenciador de pacotes e builds padrão em Rust.
+
+8. IDE:
+
+Visual Studio Code (VS Code): A IDE mais usada para desenvolvimento com Rust, especialmente com a extensão rust-analyzer, que oferece suporte completo ao desenvolvimento, depuração, e formatação de código.
+
+Nova Arquitetura:
+
+Servidor HTTP: Actix Web.
+
+Templates: Tera.
+
+Banco de Dados: PostgreSQL (usando Diesel ORM).
+
+Web Scraping: thirtyfour (para páginas com JavaScript), Reqwest e Scraper (para páginas estáticas).
+
+Cronjobs: Job Scheduler.
+
+Integração Lightning: rust-lightning.
+
+IDE: Visual Studio Code.

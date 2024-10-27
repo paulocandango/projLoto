@@ -1,0 +1,21 @@
+Construa um html responsívo ou seja que seja possível visualizar no celular e também no computador onde no cabeçalho apresenta um titulo bem bonito escrito "LotteryBTC" e na área mais cental do site tenha uma caixa bem bonita com bordas bem definidas com isso aqui no conteúdo:
+
+1 - Um combobox bonito onde possa selecionar 3 opções, PowerBall, MegaSena e LotoFácil.
+
+2 - Bolas redondas e bonitas com números no centro. Os números vão de 1 a 100, ou seja tem que ter 100 bolas. Todas essas bolas devem ficar meio apagadas ou com certa transparência dando a impressão de que estão meio que desabilitadas.
+
+3 - Caso o usuário escolha megasena, a tela deve "habilitar" permitir selecionar os números de 1 a 60.
+
+4 - Caso o usuário escolha no combo lotofacil, o sistema deve "habilitar" apenas as primeiras 25 bolas com os números de 1 a 25.
+
+5 - Caso o usuário escolha powerball na combo o sistema deve habilitar a escolha de 5 numéros que vão de 1 a 69.
+
+6 - Conforme o usuário vai clicando nas bolas, os números escolhidos devem aparecer um campo de texto que aparece abaixo das bolas.
+
+7 - Também haverá um campo de texto para informar a carteira bitcoin que receberá o prêmio.
+
+8 - No final de tudo tem que ter um botão grande e bonito escrito "Apostar" que faz o submit do formulário com todos os campos preenchidos.
+
+9 - Caso o usuário clique no botão "Apostar" a seguinte regra deve ser executada:
+
+Se ((o usuário escolheu no combo "Mega Sena" e selecionou menos que 6 ou mais que 15 bolas) OU se (o usuário escolheu "Lotofácil" e selecionou menos que 15 ou mais que 20 números) OU  se (o usuário escolheu 'Powerball' e selecionou menos 6 numeros ou mais que 6 números)) então a tela deve lançar um alert com a mensagem, configuração de jogo inválida e não submeter o formulário, caso nenhuma das regras sejam atendida o formulário é submetido

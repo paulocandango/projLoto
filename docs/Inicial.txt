@@ -1,0 +1,74 @@
+https://chatgpt.com/share/6714ce32-86cc-800a-ba26-16af6eee7197
+
+Como eu faço para criar um projeto chamado "projLoto" com essa arquitetura usando o RustRover InteliJ, em ambiente Windows?
+
+1. Servidor HTTP e Controllers:
+
+Actix Web: Continua sendo a melhor escolha para alta performance e escalabilidade no backend em Rust.
+
+2. Views e Templates:
+
+Tera: Mantenho como sistema de templates para renderizar HTML, fácil de usar e amplamente adotado.
+
+3. Persistência e Banco de Dados:
+
+Diesel: ORM robusto para trabalhar com bancos de dados relacionais. O banco de dados mais comum para esse tipo de projeto seria PostgressSQL, conhecido por sua performance e recursos avançados.
+
+4. Web Scraping:
+
+thirtyfour: Biblioteca Rust para automação de browsers (bindings do Selenium), necessária para carregar páginas que executam JavaScript. Isso resolverá o problema do carregamento assíncrono dos números da Mega-Sena.
+
+5. Cronjobs:
+
+Job Scheduler: Permite o agendamento e execução de tarefas como scraping em intervalos específicos.
+
+6. Integração com Lightning Network:
+
+rust-lightning: Mantém-se como a biblioteca para implementar pagamentos via Lightning Network.
+
+7. Gerenciamento de Pacotes e Builds:
+
+Cargo: O gerenciador de pacotes e builds padrão em Rust.
+
+8. IDE:
+
+Visual Studio Code (VS Code): A IDE mais usada para desenvolvimento com Rust, especialmente com a extensão rust-analyzer, que oferece suporte completo ao desenvolvimento, depuração, e formatação de código.
+
+Nova Arquitetura:
+
+Servidor HTTP: Actix Web.
+
+Templates: Tera.
+
+Banco de Dados: PostgressSQL (usando Diesel ORM).
+
+Web Scraping: thirtyfour (para páginas com JavaScript), Reqwest e Scraper (para páginas estáticas).
+
+Cronjobs: Job Scheduler.
+
+Integração Lightning: rust-lightning.
+
+IDE: RustRover InteliJ
+
+Essa arquitetura é mais robusta e atende à necessidade de scraping de páginas dinâmicas, além de utilizar ferramentas populares e bem suportadas na comunidade Rust.
+
+E que esteja preparado para ser publicado Principalmente no Railway.app mas talvez em Render.com
+Obs: Esse projeto será publicado no final de tudo no Railway.app
+
+-------------------------------------------------------------------
+
+cargo setup
+
+
+
+
+--------------------------------------------------------------------
+
+
+
+Ao rodar esse comando:
+cargo install diesel_cli --no-default-features --features mysql
+
+Recebi esse erro:
+error: failed to compile `diesel_cli v2.2.4`, intermediate artifacts can be found at `C:\Users\PAULO~1.MOR\AppData\Local\Temp\cargo-installJgXxde`.                                                                                
+To reuse those artifacts with a future compilation, set the environment variable `CARGO_TARGET_DIR` to that path.

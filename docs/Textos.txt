@@ -1,0 +1,60 @@
+Minha ideia é ter um sistema de loteria que seja extremamente distribuído e simplificado onde os sorteios sejam feitos pelas entidades oficiais de cada loteria como por exemplo a mega-sena da Caixa econômica Federal ou o Power ball de entidade Americana ou o China Walfare Lottery, ou qualquer outro tipo de resultado que seja divulgado na internet através de algum site. 
+
+Minha proposta é que apostadores possam efetuar apostas pagando e recebendo em Bitcoin, de forma anônima e segura. 
+
+E o sistema de loterias descentralizado reconheceria esses sorteios e Faria o pagamento dos prêmios aos ganhadores automaticamente através dos resultados divulgados na internet.
+
+Tem taxas. Sem contribuições. Sem descontos. Sem acumulações.
+
+FUNCIONALIDADES
+
+1 - Um CRUD interno de cadastro de sorterios, onde seria possível cadastrar:
+	1.1 Nome do Jogo: Por exemplo: Mega-sena, Lotofácil, Powerball
+	1.2 URL para o Scraping: Por exemplo:
+		https://loterias.caixa.gov.br/Paginas/Mega-Sena.aspx
+		https://loterias.caixa.gov.br/Paginas/Quina.aspx
+		https://loterias.caixa.gov.br/Paginas/Lotofacil.aspx
+	1.3 [DESAFIO] "Regex" ou outro padrão para extração dos números sorteados na URL Scraping.
+		
+2 - Um CRUD para registro de apostas em bitcoin
+	2.1 - Criar
+	2.1 - Ler
+	2.3 - Atualizar
+	2.4 - Deletar
+	2.5 - Pagar (Em lightning com baixa automática, travando Alterar e Deletar)
+	
+2 - Uma tarefa agendada que será executada a cada X horas, para recuperar informações das páginas html públicas cadastradas como URL Scraping:
+		https://loterias.caixa.gov.br/Paginas/Mega-Sena.aspx
+		https://loterias.caixa.gov.br/Paginas/Quina.aspx
+		https://loterias.caixa.gov.br/Paginas/Lotofacil.aspx
+	3.1 - Persistir o identificador do sorteio e os números sorteados no banco de dados.
+
+
+3 - Listar todas essas informações extraidas em uma página html disponibilizada em um servidor web como NGinx ou Apache por exemplo.
+
+
+4 - Um crud de cadastro de apostas, onde:
+	4.1 - O usuário escolheria os "números" que quer apostar;
+	4.2 - Informaria o endereço onde quer receber o prêmio caso seja premiado;
+	4.3 - Emitiria um "bilhete" dessa aposta;
+	4.4 - Pagaria esse bilhete via Ligthning;
+
+5 - Permitir transmitir para a rede OnChain ou Ligthning, uma transação de pagamento para o endereço cadastrado pelo usuário no bilhete da aposta, pagando o prêmio recebido, caso os números capturados pelo Web Scraping sejam identicos aos números escolhidos pelo usuário ao registrar o bilhete. 
+
+
+*Obs: Creio que tudo pode ser feito usando Rust.
+
+------------------------------------------------------
+[pt-BR]
+Minha proposta é desenvolver um sistema de loteria descentralizado, baseado em sorteios oficiais como Mega-Sena, Powerball, China Welfare Lottery, ou qualquer outro disponível na Web, utilizando Bitcoin para pagamentos e recebimentos. A captura dos resultados será automatizada por web scraping diretamente dos sites oficiais.
+
+Os apostadores participarão de forma anônima e segura, registrando apostas e pagando via Lightning Network. Os bilhetes emitidos conterão os números escolhidos e o endereço Bitcoin para o recebimento automático dos prêmios. Se os números apostados coincidirem com o resultado oficial, o sistema realizará o pagamento direto ao ganhador, sem taxas, impostos ou intermediários.
+
+O sistema será implementado em Rust, utilizando Actix Web como servidor para gerenciar as apostas e exibir informações em tempo real. Tarefas agendadas garantirão a atualização contínua dos sorteios e a automação completa dos pagamentos. Sem acumulação, os prêmios serão distribuídos entre os jogadores que mais se aproximarem do resultado, aumentando a justiça na premiação.
+
+[en-US]
+My proposal is to develop a decentralized lottery system based on official draws such as Mega-Sena, Powerball, China Welfare Lottery, or any other available on the web, using Bitcoin for payments and payouts. The results will be automatically captured through web scraping directly from the official websites.
+
+Participants will place bets anonymously and securely, registering their bets and paying via Lightning Network. The issued tickets will contain the chosen numbers and the Bitcoin address for automatic prize payouts. If the chosen numbers match the official results, the system will execute direct payment to the winner, with no fees, taxes, or intermediaries.
+
+The system will be built in Rust, using Actix Web as the server to manage bets and display real-time information. Scheduled tasks will ensure continuous updates of lottery results and complete automation of payments. Without prize accumulation, winnings will be distributed among players closest to the winning numbers, promoting fairness in the prize distribution.

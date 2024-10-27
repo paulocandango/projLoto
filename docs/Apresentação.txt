@@ -1,0 +1,110 @@
+What's the name of your idea?
+
+[pt-BR]
+Zero - Proibição e Excesso de Regulação
+O excesso de controle estatal e a proibição das apostas limitam a liberdade econômica.
+
+1 - Depreciação do Prêmio e Desvalorização Monetária
+1.1 - Prêmios pagos em moedas voláteis, como Nairas Nigeriana ou Pesos Venezuelano, podem perder valor ao longo do tempo, já que o montante raramente é gasto rapidamente.
+
+2 - Anonimato Frágil
+2.1 - Em muitos países, como o Brasil, o anonimato dos ganhadores não é garantido, expondo-os a riscos de extorsão e assédio.
+
+3 - Risco de Fraude nos Sorteios
+3.1 - Quando uma única entidade controla sorteios, arrecadação e pagamento dos prêmios, o risco de fraude aumenta.
+3.2 - Casos como o de João Alves, deputado que ganhou na loteria 200 vezes, ilustram essas suspeitas.
+
+4 - Tributação Excessiva e Retenção Governamental
+4.1 - No Brasil, 54,65% da arrecadação da Mega-Sena é destinada a impostos e repasses sociais, incluindo:
+
+INSS: 17,32%
+FNSP: 9,57%
+Caixa Econômica: 20%
+4.2 - Em outros países, como EUA e China, cerca de 50% é pago aos apostadores, com o governo sendo “sócio” das apostas.
+5 - Acumulação e Distribuição Injusta
+5.1 - A baixa chance de acerto favorece prêmios acumulados por longos períodos.
+
+6 - Dificuldade no Resgate de Prêmios
+6.1 - Muitos bilhetes premiados não são conferidos, resultando em prêmios não reclamados que retornam à loteria ou ao governo.
+
+[en-US]
+
+0 - Prohibition and Excessive Regulation
+Excessive state control and betting prohibitions limit economic freedom.
+
+1 - Prize Depreciation and Currency Devaluation
+1.1 - Prizes paid in volatile currencies, such as Nigerian naira or Venezuelan pesos, can lose value over time, as the amount is rarely spent quickly.
+
+2 - Weak Anonymity
+2.1 - In many countries, like Brazil, winners' anonymity is not guaranteed, exposing them to risks such as extortion and harassment.
+
+3 - Risk of Fraud in Draws
+3.1 - When a single entity manages the draws, collection, and prize payouts, the risk of fraud increases.
+3.2 - Cases like that of João Alves, a congressman who won the lottery 200 times, illustrate these concerns.
+
+4 - Excessive Taxation and Government Retention
+4.1 - In Brazil, 54.65% of Mega-Sena’s revenue is allocated to taxes and social programs, including:
+
+INSS: 17.32%
+FNSP: 9.57%
+Caixa Econômica: 20%
+4.2 - In other countries, such as the USA and China, around 50% of the revenue is paid to bettors, with the government acting as a “partner” in the bets.
+5 - Accumulation and Unfair Prize Distribution
+5.1 - The low odds of winning cause prizes to accumulate over long periods.
+
+6 - Difficulty in Claiming Prizes
+6.1 - Many winners do not check their tickets, resulting in unclaimed prizes being returned to the lottery or the government.
+
+-----------------------------------------------------------------
+
+
+[pt-BR]
+Minha proposta é desenvolver um sistema de loteria descentralizado, baseado em sorteios oficiais como Mega-Sena, Powerball, China Welfare Lottery, ou qualquer outro disponível na Web, utilizando Bitcoin para pagamentos e recebimentos. A captura dos resultados será automatizada por web crawler diretamente dos sites oficiais.
+
+Os apostadores participarão de forma anônima e segura, registrando apostas e pagando via Lightning Network. Os bilhetes emitidos conterão os números escolhidos e o endereço Bitcoin para o recebimento automático dos prêmios. Se os números apostados coincidirem com o resultado oficial, o sistema realizará o pagamento direto ao ganhador, sem taxas, impostos ou intermediários.
+
+O sistema será implementado em Rust, utilizando Actix Web como servidor para gerenciar as apostas e exibir informações em tempo real. Tarefas agendadas garantirão a atualização contínua dos sorteios e a automação completa dos pagamentos. Sem acumulação, os prêmios serão distribuídos entre os jogadores que mais se aproximarem do resultado, aumentando a justiça na premiação.
+
+[en-US]
+My proposal is to develop a decentralized lottery system based on official draws such as Mega-Sena, Powerball, China Welfare Lottery, or any other available on the web, using Bitcoin for payments and payouts. The results will be automatically captured through web crawler directly from the official websites.
+
+Participants will place bets anonymously and securely, registering their bets and paying via Lightning Network. The issued tickets will contain the chosen numbers and the Bitcoin address for automatic prize payouts. If the chosen numbers match the official results, the system will execute direct payment to the winner, with no fees, taxes, or intermediaries.
+
+The system will be built in Rust, using Actix Web as the server to manage bets and display real-time information. Scheduled tasks will ensure continuous updates of lottery results and complete automation of payments. Without prize accumulation, winnings will be distributed among players closest to the winning numbers, promoting fairness in the prize distribution.
+
+-------------------------------------------------------------------
+
+https://github.com/paulocandango/projLoto
+
+--------------------------------------------------------------------
+
+
+
+Todo o projeto foi desenvolvido e refinado durante o hackathon, existindo apenas a ideia inicial de uma loteria baseada em Bitcoin. | The entire project was developed and refined during the hackathon, with only the initial idea of a Bitcoin-based lottery existing beforehand.
+
+
+
+-----------------------------------------------------------------
+
+[pt-BR]
+O projeto Lottery BTC foi desenvolvido em Rust usando Actix Web para o backend e integração com a Lightning Network via LNBits para pagamentos descentralizados. A persistência é gerenciada com Diesel ORM, e tarefas automatizadas com Job Scheduler e Tokio.
+
+A aplicação faz web crawler com Reqwest e Scraper para capturar resultados de loterias oficiais. Templates são renderizados com Tera, e variáveis de ambiente são configuradas via dotenvy. Para gerar QR codes e manipular dados, utilizamos qrcode, base64 e serde.
+
+[en-US]
+The Lottery BTC project was developed in Rust using Actix Web for the backend and integration with the Lightning Network via LNBits for decentralized payments. Persistence is managed with Diesel ORM, and tasks are automated with Job Scheduler and Tokio.
+
+The application performs web crawler with Reqwest and Scraper to capture official lottery results. Templates are rendered with Tera, and environment variables are configured via dotenvy. To generate QR codes and handle data, we use qrcode, base64, and serde.
+
+
+-------------------------------------------------------------------
+
+
+
+
+
+[pt-BR]
+O projeto Lottery BTC contribui para a comunidade Bitcoin e Lightning ao permitir que qualquer pessoa ou empresa, mesmo com limitações de hardware, rode o programa e crie suas próprias loterias. Isso democratiza o acesso a sistemas de loteria descentralizados, incentivando o uso de Bitcoin e Lightning Network para pagamentos seguros e automáticos, além de promover transparência e inovação no setor.
+
+[en-US]
+The Lottery BTC project contributes to the Bitcoin and Lightning community by enabling anyone, even with limited hardware, to run the program and create their own lotteries. This democratizes access to decentralized lottery systems, encourages the use of Bitcoin and the Lightning Network for secure and automatic payments, and fosters transparency and innovation in the sector.
