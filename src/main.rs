@@ -51,8 +51,8 @@ async fn main() {
 // Função que imprime um log quando é executada
 async fn update_crawlers() {
     //println!("--- CRAWLERS DISABLED - DISABLED CRAWLERS ----");
-    println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
-    println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
+    println!("--- VISIT http://localhost:8080/ ----");
+    println!("--- VISIT http://localhost:8080/setup ----");
     println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
     mega_sena_crawler::executar().await;
     loto_facil_crawler::executar().await;
