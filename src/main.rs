@@ -6,7 +6,7 @@ mod dinamico_crawler;
 mod setup;
 mod bet;
 
-use std::env;
+use std::{env, io};
 use tokio::time::{self, Duration};
 use actix_web::{web, App, HttpServer, Responder};
 use tera::{Tera, Context};
@@ -35,9 +35,7 @@ async fn main() {
     println!("YOU NEED RUN MYSQL WITH AS CONFIGURATION: {}", url.as_str());
 
     if let Err(e) = start_mysql_service().await {
-        eprintln!("Erro ao iniciar o serviço MySQL: {}", e);
-        println!(" LEIA O ARQUIVO LEIA-ME.TXT");
-        println!(" READ FILE LEIA-ME.TXT");
+        eprintln!("Erro ao executar o comando: {}", e);
         return;
     }
 
@@ -56,25 +54,31 @@ async fn main() {
         // Aguarda o próximo "tick" do intervalo
         intervalo.tick().await;
 
-        // 3. Executa a função `update_crawlers` a cada 5 segundos
+        // 3. Executa a função `update_crawlers` a cada x segundos
         update_crawlers().await;
     }
 
 }
 
 
-async fn start_mysql_service() -> Result<(), std::io::Error> {
+async fn start_mysql_service() -> Result<(), io::Error> {
     println!("Iniciando serviço MySQL...");
+
+    // Tenta executar o comando 'net start mysql80'
     let status = Command::new("cmd")
-        .args(["/C", "net start mysql80"]) // Executa o comando no Windows
+        .args(["/C", "net start mysql80"])
         .status()?;
 
     if status.success() {
         println!("Serviço MySQL iniciado com sucesso.");
-        Ok(())
     } else {
-        Ok(())
+        eprintln!("Erro: O serviço MySQL não pôde ser iniciado.");
+        println!(" LEIA O ARQUIVO LEIA-ME.TXT");
+        println!(" READ FILE READ-ME.TXT");
     }
+
+    // Retorna Ok independentemente do sucesso ou falha do comando
+    Ok(())
 }
 
 // Função que imprime um log quando é executada
