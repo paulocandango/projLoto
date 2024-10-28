@@ -77,10 +77,6 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
     let qr_code_base64 = generate_qr_code_base64(payment_request);
     println!("qr_code_base64 {:?}", qr_code_base64);
 
-    if let Err(e) = create_new_bet(checking_id, &form.lottery, &form.wallet, &form.numbers).await {
-        return HttpResponse::InternalServerError().body("Erro ao registrar a aposta");
-    }
-
     let mut context = Context::new();
     context.insert("lottery", &form.lottery);
     context.insert("wallet", &form.wallet);
