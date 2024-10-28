@@ -62,14 +62,10 @@ pub async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
 
 // Controller para a rota /placeBet
 pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl Responder {
-    let formatted_balance = get_wallet_details()
-        .await
-        .unwrap_or("0".to_string())
-        .parse::<u64>()
-        .unwrap_or(0)
-        .to_formatted_string(&Locale::en);
 
-    let VALOR_FIXO_APOSTA = 100 * 1000;
+    let formatted_balance = "1000".to_string();
+
+    let VALOR_FIXO_APOSTA = 1000 * 1000;
     let invoice_response = create_invoice(VALOR_FIXO_APOSTA, "Aposta LotteryBTC").await.unwrap();
     println!("invoice_response {:?}", invoice_response);
 
@@ -108,11 +104,6 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
-// Função para obter o saldo da carteira
-async fn get_wallet_details() -> Result<String, Box<dyn StdError>> {
-    // Lógica para obter os detalhes da carteira
-    Ok("1000".to_string())  // Exemplo de saldo
-}
 
 // Função para criar uma fatura Lightning
 async fn create_invoice(amount: i64, memo: &str) -> Result<Value, reqwest::Error> {

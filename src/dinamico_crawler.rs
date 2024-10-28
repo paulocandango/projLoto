@@ -12,10 +12,6 @@ use postgres_native_tls::MakeTlsConnector;
 use tokio_postgres::{Client, Config, Connection, Error, NoTls, Socket};
 use serde_json::Value;
 
-const LN_API_KEY: &str = "1673bd51f74f41e7baeaf290be710009"; // Chave LNBits
-const LN_API_URL: &str = "https://demo.lnbits.com/api/v1/payments"; // URL da LNBits API
-
-
 pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
     println!("[CRAWLER] --- DINAMICO ---");
 
@@ -97,27 +93,21 @@ pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
                 println!("--------------------------");
 
                 if comparar_numeros(&numbers, &numbers) {
+
                     println!("Aposta Vencedora! Efetuando pagamento...");
 
-                    let VALOR_FIXO_PREMIO = 100 * 1000;
-
-                    match efetuar_pagamento_via_lnurl(&wallet, VALOR_FIXO_PREMIO).await {
+                    match efetuar_pagamento(&wallet).await {
                         Ok(_) => println!("Pagamento efetuado com sucesso para a carteira: {}", wallet),
                         Err(e) => eprintln!("Erro ao efetuar pagamento: {}", e),
                     }
+                    /*match efetuar_pagamento_via_lnurl(&wallet).await {
+                        Ok(_) => println!("Pagamento efetuado com sucesso para a carteira: {}", wallet),
+                        Err(e) => eprintln!("Erro ao efetuar pagamento: {}", e),
+                    }*/
                 } else {
                     println!("Aposta não premiada.");
                 }
             }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -177,7 +167,44 @@ fn extract_text(fragment: &Html, selector_str: &str) -> String {
 }
 
 
-async fn efetuar_pagamento_via_lnurl(ln_identifier: &str, amount: i64) -> Result<(), Box<dyn std::error::Error>> {
+async fn efetuar_pagamento(wallet: &str) -> Result<(), Box<dyn std::error::Error>> {
+
+    let VALOR_FIXO_PREMIO: i64 = 1000*1000;
+
+    let client = reqwest::Client::new(); // Cliente HTTP
+    let url = "https://api.zebedee.io/v0/payments";
+    let api_key = "xfWlrZeeNzk0JButS3LEG57k5FLTiBIq";
+
+    // Construindo os parâmetros para o payout
+    let params = serde_json::json!({
+        "amount": VALOR_FIXO_PREMIO.to_string(), // Quantidade em msats como string
+        "description": "Prêmio da aposta vencedora",
+        "invoice": wallet // Invoice BOLT11 do destinatário
+    });
+
+    // Enviando a requisição POST para a Zebedee
+    let response = client
+        .post(url)
+        .header("apikey", api_key)
+        .json(&params)
+        .send()
+        .await?;
+
+    let status = response.status();
+    let body = response.text().await.unwrap_or_else(|_| "Erro desconhecido".to_string());
+
+    // Verificando se o pagamento foi bem-sucedido
+    if status.is_success() {
+        println!("Pagamento efetuado com sucesso para: {}", wallet);
+    } else {
+        eprintln!("Erro no pagamento: {} - {}", status, body);
+    }
+
+    Ok(())
+}
+
+
+async fn efetuar_pagamento_via_lnurl(ln_identifier: &str) -> Result<(), Box<dyn std::error::Error>> {
 
     let client = reqwest::Client::new();
 
@@ -209,11 +236,13 @@ async fn efetuar_pagamento_via_lnurl(ln_identifier: &str, amount: i64) -> Result
     eprintln!("CALCULO DE VALOR MINIMO={}", min_sendable);
     eprintln!("CALCULO DE VALOR MAXIMO={}", max_sendable);
 
+    let PREMIO_FIXO: i64=1100;
 
-    // Etapa 2: Enviar o pagamento
-    let payment_url = format!("{}?amount={}", callback_url, amount);
+    let payment_url = format!("{}?amount={}", callback_url, PREMIO_FIXO);
     println!("Enviando pagamento para: {}", payment_url);
+    println!("PREMIO_FIXO: {}", PREMIO_FIXO);
 
+    // Enviando a requisição de pagamento
     let payment_response = client.get(&payment_url).send().await?;
     let payment_status = payment_response.status();
     let payment_body = payment_response.text().await.unwrap_or_else(|_| "Erro desconhecido".to_string());
@@ -229,50 +258,6 @@ async fn efetuar_pagamento_via_lnurl(ln_identifier: &str, amount: i64) -> Result
     Ok(())
 }
 
-async fn efetuar_pagamento(wallet: &str, amount: i64) -> Result<(), Box<dyn std::error::Error>> {
-    let client = reqwest::Client::new(); // Cliente HTTP
-    let url = "https://api.zebedee.io/v0/payments";
-    let api_key = "xfWlrZeeNzk0JButS3LEG57k5FLTiBIq";
-
-    // Construindo os parâmetros para o payout
-    let params = serde_json::json!({
-        "amount": amount.to_string(), // Quantidade em msats como string
-        "description": "Prêmio da aposta vencedora",
-        "invoice": wallet // Invoice BOLT11 do destinatário
-    });
-
-    // Imprimindo os parâmetros que serão enviados na requisição
-    println!("Enviando requisição para Zebedee...");
-    println!("URL: {}", url);
-    println!("Headers: apikey = {}", api_key);
-    println!("Params: {}", params.to_string());
-
-    // Enviando a requisição POST para a Zebedee
-    let response = client
-        .post(url)
-        .header("apikey", api_key)
-        .json(&params)
-        .send()
-        .await?;
-
-    // Obtendo status e corpo da resposta
-    let status = response.status();
-    let body = response.text().await.unwrap_or_else(|_| "Erro desconhecido".to_string());
-
-    // Imprimindo os resultados da resposta
-    println!("Resposta da API recebida:");
-    println!("Status: {}", status);
-    println!("Body: {}", body);
-
-    // Verificando se o pagamento foi bem-sucedido
-    if status.is_success() {
-        println!("Pagamento efetuado com sucesso para: {}", wallet);
-    } else {
-        eprintln!("Erro no pagamento: {} - {}", status, body);
-    }
-
-    Ok(())
-}
 
 // Função para comparar os números sorteados com os apostados
 fn comparar_numeros(sorteados: &str, apostados: &str) -> bool {
