@@ -5,6 +5,7 @@ mod china_welfare_crawler;
 mod dinamico_crawler;
 mod setup;
 mod bet;
+use tokio::time::{self, Duration};
 
 use std::{env, io};
 use actix_web::{web, App, HttpServer, Responder, HttpResponse};
@@ -20,6 +21,19 @@ async fn index_handler() -> impl Responder {
 }
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    let mut intervalo = time::interval(Duration::from_secs(5));
+
+    // LOOP PARA EXECUÇÃO DO CRAWLER - CASO QUEIRA RODAR O SERVIDOR WEB TERÁ QUE COMENTAR
+    /*
+    loop {
+        // Aguarda o próximo "tick" do intervalo
+        intervalo.tick().await;
+
+        // 3. Executa a função `update_crawlers` a cada x segundos
+        update_crawlers().await;
+    }
+    */
 
     println!("INICIANDO A VERSAO DA BRANCH render QUE NAO TEM OS CRAWLERS - CRIADA PARA PUBLICACAO NO SITE RENDER.COM");
     println!("OS CROWLERS ESTAO NA BRANCH local ");
@@ -83,4 +97,13 @@ fn parse_numbers(numbers_str: &str) -> Vec<i32> {
         .split(',') // Divide a string pelos separadores de vírgula
         .filter_map(|s| s.trim().parse::<i32>().ok()) // Remove espaços e faz o parsing para i32
         .collect() // Coleta os resultados em um vetor
+}
+
+async fn update_crawlers() {
+    println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
+    //mega_sena_crawler::executar().await;
+    //loto_facil_crawler::executar().await;
+    //power_ball_crawler::executar().await;
+    //china_welfare_crawler::executar().await;
+    //dinamico_crawler::executar().await;
 }
