@@ -64,6 +64,62 @@ pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
 
             println!("Concurso: {}, Números: {}", contest, numbers);
 
+
+
+
+
+
+
+
+
+
+            // Consulta as apostas feitas para essa loteria
+            let bet_sql = r#"
+                SELECT b.id_bet, b.wallet, b.numbers, b.checking_id
+                FROM Bet b
+                JOIN Lottery l ON b.id_lottery = l.id_lottery
+                WHERE l.results_url = $1
+            "#;
+
+            let bets = client.query(bet_sql, &[&url]).await?;
+            for bet in bets {
+                let id_bet: i32 = bet.get("id_bet");
+                let wallet: String = bet.get("wallet");
+                let numbers: String = bet.get("numbers");
+                let checking_id: String = bet.get("checking_id");
+
+                println!("--- Aposta Encontrada ---");
+                println!("ID da Aposta: {}", id_bet);
+                println!("Carteira: {}", wallet);
+                println!("Números da Aposta: {}", numbers);
+                println!("Checking ID: {}", checking_id);
+                println!("--------------------------");
+
+                if comparar_numeros(&numbers, &numbers) {
+                    println!("Aposta Vencedora! Efetuando pagamento...");
+
+                    match efetuar_pagamento(&wallet, 100).await {
+                        Ok(_) => println!("Pagamento efetuado com sucesso para a carteira: {}", wallet),
+                        Err(e) => eprintln!("Erro ao efetuar pagamento: {}", e),
+                    }
+                } else {
+                    println!("Aposta não premiada.");
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             sleep(Duration::from_secs(10)).await;
         }
 
