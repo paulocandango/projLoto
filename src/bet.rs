@@ -69,7 +69,8 @@ pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl 
         .unwrap_or(0)
         .to_formatted_string(&Locale::en);
 
-    let invoice_response = create_invoice(100 * 1000, "Aposta LotteryBTC").await.unwrap();
+    let VALOR_FIXO_APOSTA = 100 * 1000;
+    let invoice_response = create_invoice(VALOR_FIXO_APOSTA, "Aposta LotteryBTC").await.unwrap();
     println!("invoice_response {:?}", invoice_response);
 
     // Acessando "request" corretamente dentro de "data" -> "invoice"

@@ -10,6 +10,7 @@ use reqwest::Client as HttpClient;
 use native_tls::TlsConnector;
 use postgres_native_tls::MakeTlsConnector;
 use tokio_postgres::{Client, Config, Connection, Error, NoTls, Socket};
+use serde_json::Value;
 
 const LN_API_KEY: &str = "1673bd51f74f41e7baeaf290be710009"; // Chave LNBits
 const LN_API_URL: &str = "https://demo.lnbits.com/api/v1/payments"; // URL da LNBits API
@@ -98,7 +99,9 @@ pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
                 if comparar_numeros(&numbers, &numbers) {
                     println!("Aposta Vencedora! Efetuando pagamento...");
 
-                    match efetuar_pagamento(&wallet, 100).await {
+                    let VALOR_FIXO_PREMIO = 100 * 1000;
+
+                    match efetuar_pagamento_via_lnurl(&wallet, VALOR_FIXO_PREMIO).await {
                         Ok(_) => println!("Pagamento efetuado com sucesso para a carteira: {}", wallet),
                         Err(e) => eprintln!("Erro ao efetuar pagamento: {}", e),
                     }
@@ -173,25 +176,95 @@ fn extract_text(fragment: &Html, selector_str: &str) -> String {
         .unwrap_or_default()
 }
 
+
+async fn efetuar_pagamento_via_lnurl(ln_identifier: &str, amount: i64) -> Result<(), Box<dyn std::error::Error>> {
+
+    let client = reqwest::Client::new();
+
+    // Cortando a string na posição do '@' e pegando a parte anterior
+    let username = ln_identifier.split('@').next().unwrap_or("");
+    println!("Usuário extraído: {}", username);
+
+    // Construindo o LNURL a partir do identificador Zebedee
+    let lnurl = format!("https://zbd.gg/.well-known/lnurlp/{}", username);
+    println!("Resolvendo LNURL: {}", lnurl);
+
+    // Etapa 1: Obter informações de pagamento via LNURL
+    let lnurl_response = client.get(&lnurl).send().await?;
+    let status = lnurl_response.status();
+    let lnurl_info: Value = lnurl_response.json().await?;
+
+    println!("LNURL Info: {}", lnurl_info);
+
+    if !status.is_success() {
+        eprintln!("Erro ao resolver LNURL: {}", status);
+        return Ok(());
+    }
+
+    // Extraindo a URL de pagamento e limites
+    let callback_url = lnurl_info["callback"].as_str().unwrap();
+    let min_sendable = lnurl_info["minSendable"].as_i64().unwrap_or(0);
+    let max_sendable = lnurl_info["maxSendable"].as_i64().unwrap_or(0);
+
+    eprintln!("CALCULO DE VALOR MINIMO={}", min_sendable);
+    eprintln!("CALCULO DE VALOR MAXIMO={}", max_sendable);
+
+
+    // Etapa 2: Enviar o pagamento
+    let payment_url = format!("{}?amount={}", callback_url, amount);
+    println!("Enviando pagamento para: {}", payment_url);
+
+    let payment_response = client.get(&payment_url).send().await?;
+    let payment_status = payment_response.status();
+    let payment_body = payment_response.text().await.unwrap_or_else(|_| "Erro desconhecido".to_string());
+
+    println!("Resposta do pagamento: Status = {}, Body = {}", payment_status, payment_body);
+
+    if payment_status.is_success() {
+        println!("Pagamento efetuado com sucesso via LNURL.");
+    } else {
+        eprintln!("Erro no pagamento: {} - {}", payment_status, payment_body);
+    }
+
+    Ok(())
+}
+
 async fn efetuar_pagamento(wallet: &str, amount: i64) -> Result<(), Box<dyn std::error::Error>> {
-    let client = HttpClient::new();
+    let client = reqwest::Client::new(); // Cliente HTTP
+    let url = "https://api.zebedee.io/v0/payments";
+    let api_key = "xfWlrZeeNzk0JButS3LEG57k5FLTiBIq";
+
+    // Construindo os parâmetros para o payout
     let params = serde_json::json!({
-        "out": true,
-        "amount": amount,
-        "memo": "Prêmio da aposta vencedora",
-        "bolt11": wallet
+        "amount": amount.to_string(), // Quantidade em msats como string
+        "description": "Prêmio da aposta vencedora",
+        "invoice": wallet // Invoice BOLT11 do destinatário
     });
 
+    // Imprimindo os parâmetros que serão enviados na requisição
+    println!("Enviando requisição para Zebedee...");
+    println!("URL: {}", url);
+    println!("Headers: apikey = {}", api_key);
+    println!("Params: {}", params.to_string());
+
+    // Enviando a requisição POST para a Zebedee
     let response = client
-        .post(LN_API_URL)
-        .header("X-Api-Key", LN_API_KEY)
+        .post(url)
+        .header("apikey", api_key)
         .json(&params)
         .send()
         .await?;
 
+    // Obtendo status e corpo da resposta
     let status = response.status();
     let body = response.text().await.unwrap_or_else(|_| "Erro desconhecido".to_string());
 
+    // Imprimindo os resultados da resposta
+    println!("Resposta da API recebida:");
+    println!("Status: {}", status);
+    println!("Body: {}", body);
+
+    // Verificando se o pagamento foi bem-sucedido
     if status.is_success() {
         println!("Pagamento efetuado com sucesso para: {}", wallet);
     } else {
