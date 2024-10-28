@@ -24,6 +24,8 @@ base64 = "0.21"
 image = { version = "0.25.4", features = ["png"] }
 qrcode = "0.7"
 tokio-postgres = "0.7"
+native-tls = "0.2"
+postgres-native-tls = "0.5"
 
 [dependencies.actix-rt]  # Ativar execução assíncrona para o servidor
 version = "2.5"

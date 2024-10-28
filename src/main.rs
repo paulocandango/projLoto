@@ -103,9 +103,9 @@ async fn start_server() -> std::io::Result<()> {
             .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
             .route("/", web::get().to(index))
             .route("/setup", web::get().to(setup::setup))
-            .route("/create", web::post().to(setup::create_lottery))
-            .route("/createsetup", web::get().to(setup::create_setup))
-            .route("/delete", web::post().to(setup::delete_lottery)) // Nova rota de exclusão
+            //.route("/create", web::post().to(setup::create_lottery))
+            //.route("/createsetup", web::get().to(setup::create_setup))
+            //.route("/delete", web::post().to(setup::delete_lottery)) // Nova rota de exclusão
             .route("/bet", web::get().to(bet::bet))
             .route("/placeBet", web::post().to(bet::place_bet))
             .route("/validatePayment", web::get().to(bet::validate_payment))
