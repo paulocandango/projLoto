@@ -9,6 +9,7 @@ tera = "1.17"
 actix-files = "0.6"
 diesel = { version = "2.0", features = ["postgres"] }
 dotenvy = "0.15.7"
+dotenv = "0.15"
 reqwest = { version = "0.11", features = ["blocking", "json"] }
 scraper = "0.13"
 thirtyfour = "0.32"
@@ -22,6 +23,7 @@ num-format = "0.4"
 base64 = "0.21"
 image = { version = "0.25.4", features = ["png"] }
 qrcode = "0.7"
+tokio-postgres = "0.7"
 
 [dependencies.actix-rt]  # Ativar execução assíncrona para o servidor
 version = "2.5"

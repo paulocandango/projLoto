@@ -47,7 +47,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(tera.clone()) // Compartilha o Tera com o App
             .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
-            .route("/", web::get().to(index_handler)) // Rota para "/"
+            .route("/", web::get().to(index)) // Rota para "/"
+            .route("/setup", web::get().to(setup::setup))
             .route("/index2", web::get().to(index2_handler)) // Rota para "/index2"
     })
         .bind(address)?
