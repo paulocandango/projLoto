@@ -62,16 +62,33 @@ pub async fn bet(tmpl: web::Data<Tera>) -> impl Responder {
 
 // Controller para a rota /placeBet
 pub async fn place_bet(tmpl: web::Data<Tera>, form: web::Form<BetForm>) -> impl Responder {
-    let formatted_balance = get_wallet_details().await.unwrap_or("0".to_string())
-        .parse::<u64>().unwrap_or(0).to_formatted_string(&Locale::en);
+    let formatted_balance = get_wallet_details()
+        .await
+        .unwrap_or("0".to_string())
+        .parse::<u64>()
+        .unwrap_or(0)
+        .to_formatted_string(&Locale::en);
 
-    let invoice_response = create_invoice(100, "Aposta LotteryBTC").await.unwrap();
+    let invoice_response = create_invoice(100 * 1000, "Aposta LotteryBTC").await.unwrap();
     println!("invoice_response {:?}", invoice_response);
 
-    let payment_request = invoice_response.get("payment_request").unwrap().as_str().unwrap();
-    print!("payment_request {} ", payment_request);
+    // Acessando "request" corretamente dentro de "data" -> "invoice"
+    let payment_request = invoice_response
+        .get("data")
+        .and_then(|data| data.get("invoice"))
+        .and_then(|invoice| invoice.get("request"))
+        .and_then(|request| request.as_str())
+        .unwrap_or("");
 
-    let checking_id = invoice_response.get("checking_id").unwrap().as_str().unwrap();
+    println!("payment_request {}", payment_request);
+
+    // Acessando o "id" dentro de "data"
+    let checking_id = invoice_response
+        .get("data")
+        .and_then(|data| data.get("id"))
+        .and_then(|id| id.as_str())
+        .unwrap_or("");
+
     println!("checking_id {}", checking_id);
 
     let qr_code_base64 = generate_qr_code_base64(payment_request);
@@ -98,19 +115,18 @@ async fn get_wallet_details() -> Result<String, Box<dyn StdError>> {
 
 // Função para criar uma fatura Lightning
 async fn create_invoice(amount: i64, memo: &str) -> Result<Value, reqwest::Error> {
-    let client =  reqwest::Client::new();
-    let url = "https://demo.lnbits.com/api/v1/payments";
-    let api_key = "4b63979273164f77ab6df8c7fd68e5ae";
+    let client = reqwest::Client::new();
+    let url = "https://api.zebedee.io/v0/charges";
+    let api_key = "xfWlrZeeNzk0JButS3LEG57k5FLTiBIq";
 
     let params = serde_json::json!({
-        "out": false,
-        "amount": amount,
-        "memo": memo
+        "amount": amount.to_string(),  // Zebedee espera string para o amount
+        "description": memo
     });
 
     let response = client
         .post(url)
-        .header("X-Api-Key", api_key)
+        .header("apikey", api_key) // Zebedee usa 'apikey' como cabeçalho
         .json(&params)
         .send()
         .await?
@@ -168,20 +184,37 @@ pub async fn validate_payment(query: web::Query<PaymentQuery>) -> Result<HttpRes
     println!("Carteira: {}", wallet);
     println!("Números: {}", numbers);
 
-    let api_url = format!("https://demo.lnbits.com/api/v1/payments/{}", checking_id);
-    let api_key = "4b63979273164f77ab6df8c7fd68e5ae";
+    // Endpoint da Zebedee para verificar o status do charge
+    let api_url = format!("https://api.zebedee.io/v0/charges/{}", checking_id);
+    let api_key = "xfWlrZeeNzk0JButS3LEG57k5FLTiBIq";
 
     let client = reqwest::Client::new();
-    match client.get(&api_url).header("X-Api-Key", api_key).send().await {
-        Ok(mut response) => {
+    match client
+        .get(&api_url)
+        .header("apikey", api_key) // Cabeçalho de autenticação
+        .send()
+        .await
+    {
+        Ok(response) => {
             let status = response.status();
             let body = response.text().await.unwrap_or_else(|_| "Erro ao ler corpo".to_string());
 
+
+
             println!("Status: {}, Corpo: {}", status, body);
+
+
+
 
             if status.is_success() {
                 if let Ok(json) = from_str::<Value>(&body) {
-                    if json.get("paid").and_then(Value::as_bool) == Some(true) {
+                    // Verifica se o status do pagamento é "completed" no campo correto
+                    if json
+                        .get("data")
+                        .and_then(|data| data.get("status"))
+                        .and_then(Value::as_str)
+                        == Some("completed")
+                    {
                         if let Err(e) = create_new_bet(&checking_id, &lottery, &wallet, &numbers).await {
                             eprintln!("Erro ao criar aposta: {}", e);
                         }
@@ -189,6 +222,7 @@ pub async fn validate_payment(query: web::Query<PaymentQuery>) -> Result<HttpRes
                     }
                 }
             }
+
         }
         Err(err) => {
             eprintln!("Erro na requisição: {:?}", err);
