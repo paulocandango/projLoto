@@ -18,6 +18,7 @@
         <table class="table-discret">
             <thead>
             <tr>
+                <th>ID</th>
                 <th>Nome da Loteria</th>
                 <th>URL dos Resultados</th>
                 <th>Seletor do Concurso</th>
@@ -32,6 +33,7 @@
                 <td>{{ lottery.1 }}</td>
                 <td>{{ lottery.2 }}</td>
                 <td>{{ lottery.3 }}</td>
+                <td>{{ lottery.4 }}</td>
                 <td>
                     <form action="/delete" method="post">
                         <input type="hidden" name="id_lottery" value="{{ lottery.0 }}">
