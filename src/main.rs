@@ -8,7 +8,7 @@ mod bet;
 
 use std::{env, io};
 use tokio::time::{self, Duration};
-use actix_web::{web, App, HttpServer, Responder};
+use actix_web::{web, App, HttpServer, Responder, HttpResponse};
 use tera::{Tera, Context};
 use actix_files as fs;
 use dotenvy::dotenv;
@@ -17,46 +17,44 @@ use std::process::Command;
 use mysql_async::Opts;
 // Para servir arquivos estáticos
 
+// Handler para a rota `/index2`
+async fn index2_handler() -> impl Responder {
+    HttpResponse::Ok().body("Você foi redirecionado para /index2")
+}
+
+// Handler para a rota `/`
+async fn index_handler() -> impl Responder {
+    HttpResponse::Found()
+        .append_header(("Location", "/index2"))
+        .finish()
+}
 #[actix_web::main]
-async fn main() {
-
-    // 1. Imprime um log quando começa a executar
-    println!("--- INICIANDO A EXECUÇÃO DA MAIN ----");
-
-    // Carrega as variáveis do arquivo .env
+async fn main() -> std::io::Result<()> {
+    // Carrega as variáveis de ambiente do arquivo .env, se existir
     dotenv().ok();
 
-    // Lê a variável MYSQL_URL do ambiente
-    let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
-    println!("Conectando ao banco de dados em: {}", url.as_str());
-    println!("VOCÊ PRECISA ESTAR RODANDO UM MYSQL COM ESSA CONFIGURACAO: {}", url.as_str());
-    println!("YOU NEED RUN MYSQL WITH AS CONFIGURATION: {}", url.as_str());
+    // Obtém a porta da variável de ambiente ou usa a 8080 como padrão
+    let port = env::var("PORT").unwrap_or_else(|_| "80".to_string());
+    let address = format!("0.0.0.0:{}", port);
+    println!("Iniciando servidor na porta {}", port);
 
-    if let Err(e) = start_mysql_service().await {
-        eprintln!("Erro ao executar o comando: {}", e);
-        return;
-    }
+    // Cria uma instância de Tera para carregar os templates
+    let tera = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*")).unwrap();
 
-    // 2. Agenda a execução da função `update_crawlers` a cada 5 segundos
-    let mut intervalo = time::interval(Duration::from_secs(3*60));
-
-    // 3. Iniciar o servidor HTTP antes do loop
-    println!("--- INICIANDO SERVIDOR HTTP ---");
-    actix_web::rt::spawn(start_server()); // Executa o servidor em segundo plano
-
-    // Fim da main
-    println!("--- FIM DA MAIN ----");
-
-
-    loop {
-        // Aguarda o próximo "tick" do intervalo
-        intervalo.tick().await;
-
-        // 3. Executa a função `update_crawlers` a cada x segundos
-        update_crawlers().await;
-    }
-
+    // Inicia o servidor Actix Web
+    HttpServer::new(move || {
+        // Usa `move` para mover `tera` para dentro da closure
+        App::new()
+            .data(tera.clone()) // Compartilha o Tera com o App
+            .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
+            .route("/", web::get().to(index_handler)) // Rota para "/"
+            .route("/index2", web::get().to(index2_handler)) // Rota para "/index2"
+    })
+        .bind(address)?
+        .run()
+        .await
 }
+
 
 
 async fn start_mysql_service() -> Result<(), io::Error> {
