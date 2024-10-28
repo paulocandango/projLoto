@@ -149,3 +149,41 @@ pub async fn create_lottery(
             .body(format!("Erro na conexão com o banco de dados: {}", e)),
     }
 }
+
+pub async fn delete_lottery(
+    form: web::Form<HashMap<String, String>>,
+) -> impl Responder {
+    // Obtemos o ID da loteria e tentamos convertê-lo para inteiro
+    let id_lottery: i32 = match form.get("id_lottery").and_then(|v| v.parse().ok()) {
+        Some(id) => id,
+        None => {
+            println!("ID inválido recebido: {:?}", form.get("id_lottery"));
+            return HttpResponse::BadRequest().body("ID inválido.");
+        }
+    };
+
+    // Imprime o ID assim que é possível
+    println!("Deletando a loteria com ID: {}", id_lottery);
+
+    match establish_connection().await {
+        Ok(client) => {
+            let query = "DELETE FROM lottery WHERE id_lottery = $1";
+            match client.execute(query, &[&id_lottery]).await {
+                Ok(_) => {
+                    println!("Loteria com ID {} excluída com sucesso.", id_lottery);
+                    HttpResponse::SeeOther().header("Location", "/setup").finish()
+                }
+                Err(e) => {
+                    println!("Erro ao excluir no banco: {}", e);
+                    HttpResponse::InternalServerError()
+                        .body(format!("Erro ao excluir no banco: {}", e))
+                }
+            }
+        }
+        Err(e) => {
+            println!("Erro na conexão com o banco de dados: {}", e);
+            HttpResponse::InternalServerError()
+                .body(format!("Erro na conexão com o banco de dados: {}", e))
+        }
+    }
+}
