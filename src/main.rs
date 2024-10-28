@@ -108,8 +108,8 @@ async fn update_crawlers() {
     println!("--- MANDATORY IN C:\\Program Files\\Mozilla Firefox\\firefox.exe ----");
 
     dinamico_crawler::executar().await;
-    //mega_sena_crawler::executar().await;
-    //loto_facil_crawler::executar().await;
-    //power_ball_crawler::executar().await;
-    //china_welfare_crawler::executar().await;
+    mega_sena_crawler::executar().await;
+    loto_facil_crawler::executar().await;
+    power_ball_crawler::executar().await;
+    china_welfare_crawler::executar().await;
 }
