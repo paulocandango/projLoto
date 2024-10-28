@@ -49,7 +49,8 @@ async fn main() -> std::io::Result<()> {
             .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
             .route("/", web::get().to(index)) // Rota para "/"
             .route("/setup", web::get().to(setup::setup))
-            .route("/index2", web::get().to(index2_handler)) // Rota para "/index2"
+            .route("/createsetup", web::get().to(setup::create_setup))
+            .route("/create", web::post().to(setup::create_lottery))
     })
         .bind(address)?
         .run()
@@ -101,14 +102,14 @@ async fn start_server() -> std::io::Result<()> {
         App::new()
             .data(tera.clone()) // Compartilha o Tera com o App
             .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
-            .route("/", web::get().to(index))
-            .route("/setup", web::get().to(setup::setup))
+            //.route("/", web::get().to(index))
+            //.route("/setup", web::get().to(setup::setup))
             //.route("/create", web::post().to(setup::create_lottery))
             //.route("/createsetup", web::get().to(setup::create_setup))
             //.route("/delete", web::post().to(setup::delete_lottery)) // Nova rota de exclusão
-            .route("/bet", web::get().to(bet::bet))
-            .route("/placeBet", web::post().to(bet::place_bet))
-            .route("/validatePayment", web::get().to(bet::validate_payment))
+            //.route("/bet", web::get().to(bet::bet))
+            //.route("/placeBet", web::post().to(bet::place_bet))
+            //.route("/validatePayment", web::get().to(bet::validate_payment))
     })
         .bind("0.0.0.0:80")?
         .run()

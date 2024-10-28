@@ -3,6 +3,7 @@ use tera::{Tera, Context};
 use tokio_postgres::{Error, Client, Config};
 use native_tls::TlsConnector;
 use postgres_native_tls::MakeTlsConnector;
+use std::collections::HashMap;
 
 // Função para estabelecer a conexão com PostgreSQL via TLS
 async fn establish_connection() -> Result<Client, Error> {
@@ -94,5 +95,57 @@ async fn fetch_lottery_data() -> Result<Vec<(i32, String, String, String, String
             println!("Erro ao conectar ao banco de dados: {:?}", connection_error);
             Err(connection_error)
         }
+    }
+}
+
+// Rota para renderizar o formulário de criação
+pub async fn create_setup(tmpl: web::Data<Tera>) -> impl Responder {
+    let context = Context::new();
+
+    // Renderiza a página do formulário para criar novo registro
+    let rendered = tmpl.render("createsetup.html", &context).unwrap();
+
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(rendered)
+}
+
+
+// Função para criar uma nova loteria a partir de um formulário
+pub async fn create_lottery(
+    form: web::Form<HashMap<String, String>>,
+) -> impl Responder {
+    let lottery_name = form.get("lottery_name").unwrap_or(&String::new()).to_string();
+    let results_url = form.get("results_url").unwrap_or(&String::new()).to_string();
+    let contest_selector = form.get("contest_selector").unwrap_or(&String::new()).to_string();
+    let numbers_selector = form.get("numbers_selector").unwrap_or(&String::new()).to_string();
+
+    match establish_connection().await {
+        Ok(client) => {
+            let query = "
+                INSERT INTO lottery (lottery_name, results_url, contest_selector, numbers_selector)
+                VALUES ($1, $2, $3, $4)
+            ";
+            match client
+                .execute(
+                    query,
+                    &[
+                        &lottery_name,
+                        &results_url,
+                        &contest_selector,
+                        &numbers_selector,
+                    ],
+                )
+                .await
+            {
+                Ok(_) => HttpResponse::SeeOther()
+                    .header("Location", "/setup")
+                    .finish(),
+                Err(e) => HttpResponse::InternalServerError()
+                    .body(format!("Erro ao inserir no banco: {}", e)),
+            }
+        }
+        Err(e) => HttpResponse::InternalServerError()
+            .body(format!("Erro na conexão com o banco de dados: {}", e)),
     }
 }
