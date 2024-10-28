@@ -5,21 +5,20 @@ use thirtyfour::{DesiredCapabilities, WebDriver};
 use tokio; // Importa o módulo tokio
 use tokio::time::sleep;
 use scraper::{Html, Selector}; // Importa o scraper
-use mysql_async::{prelude::*, Pool, Row};
-use std::error::Error;
-use reqwest::Client; // Adicionando o cliente HTTP
 
-const LN_API_KEY: &str = "1673bd51f74f41e7baeaf290be710009"; // Substitua com sua chave
+use reqwest::Client as HttpClient;
+use native_tls::TlsConnector;
+use postgres_native_tls::MakeTlsConnector;
+use tokio_postgres::{Client, Config, Connection, Error, NoTls, Socket};
 
+const LN_API_KEY: &str = "1673bd51f74f41e7baeaf290be710009"; // Chave LNBits
 const LN_API_URL: &str = "https://demo.lnbits.com/api/v1/payments"; // URL da LNBits API
 
 
-pub async fn executar() -> Result<(), Box<dyn Error>> {
-
+pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
     println!("[CRAWLER] --- DINAMICO ---");
 
     let result = async {
-
         // Inicia o geckodriver como um subprocesso
         let mut geckodriver = Command::new("resource/geckodriver.exe")
             .arg("--port")
@@ -34,87 +33,36 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
         // Inicia o WebDriver
         let driver = WebDriver::new("http://127.0.0.1:4444", caps).await?;
 
-        // Conexão com o banco de dados
-        let url = env::var("MYSQL_URL").expect("MYSQL_URL não encontrada");
-        println!("url: {}", url);
-        let pool = Pool::new(url.as_str());
-        let mut conn = pool.get_conn().await?;
+        // Conexão com PostgreSQL
+        let (client, connection) = establish_pg_connection().await?;
+        tokio::spawn(async move {
+            if let Err(e) = connection.await {
+                eprintln!("Erro na conexão: {}", e);
+            }
+        });
 
         // Consulta os sites dinâmicos e seus seletores
-        let sql = "SELECT results_url, contest_selector, numbers_selector FROM Lottery WHERE is_dinamic = 1";
-        let results: Vec<Row> = conn.exec(sql, ()).await?;
+        let sql = "SELECT results_url, contest_selector, numbers_selector FROM Lottery WHERE is_dinamic = true";
+        let results = client.query(sql, &[]).await?;
 
         // Itera sobre cada resultado da consulta
         for row in results {
-            let url: String = row.get("results_url").unwrap_or_default();
-            let contest_selector: String = row.get("contest_selector").unwrap_or_default();
-            let numbers_selector: String = row.get("numbers_selector").unwrap_or_default();
+            let url: String = row.get("results_url");
+            let contest_selector: String = row.get("contest_selector");
+            let numbers_selector: String = row.get("numbers_selector");
 
-            println!("[CRAWLER] Acessando URL: {}", url);
-
+            // Faz scraping da página
             driver.get(&url).await?;
-            sleep(Duration::from_secs(5)).await;
+            sleep(Duration::from_secs(10)).await;
 
-            let html = driver.page_source().await?;
-            let document = Html::parse_document(&html);
+            // Extrai e processa os dados
+            let page_source = driver.source().await?;
+            let fragment = Html::parse_document(&page_source);
 
-            // Recuperando o ID do concurso
-            let concurso_selector = Selector::parse(contest_selector.as_str()).unwrap();
-            if let Some(resultado) = document.select(&concurso_selector).next() {
-                // Captura o texto do concurso
-                let concurso_texto = resultado.inner_html(); // ou use resultado.text() para pegar apenas o texto sem HTML
-                println!("IDENTIFICADOR DO CONCURSO: {}", concurso_texto);
-            } else {
-                println!("Resultado não encontrado.");
-            }
+            let contest = extract_text(&fragment, &contest_selector);
+            let numbers = extract_text(&fragment, &numbers_selector);
 
-            // Recuperando os ELEMENTOS sorteados
-            let elementos_texto = if let Ok(elementos_sel) = Selector::parse(&numbers_selector) {
-                if let Some(resultado) = document.select(&elementos_sel).next() {
-                    resultado.inner_html()
-                } else {
-                    String::new()
-                }
-            } else {
-                String::new()
-            };
-            println!("Números sorteados: {}", elementos_texto);
-
-            // RECUPERANDO APOSTAS FEITAS PARA ESSA LOTERIA
-            let bet_sql = r#"
-                SELECT b.*
-                FROM Bet b
-                JOIN Lottery l ON b.id_lottery = l.id_lottery
-                WHERE l.results_url = ?
-            "#;
-
-            let bets: Vec<Row> = conn.exec(bet_sql, (url.clone(),)).await?;
-
-            for bet in bets {
-                let id_bet: i64 = bet.get("id_bet").unwrap_or(0);
-                let wallet: String = bet.get("wallet").unwrap_or_default();
-                let numbers: String = bet.get("numbers").unwrap_or_default();
-                let checking_id: String = bet.get("checking_id").unwrap_or_default();
-
-                println!("--- Aposta Encontrada ---");
-                println!("ID da Aposta: {}", id_bet);
-                println!("Carteira: {}", wallet);
-                println!("Números da Aposta: {}", numbers);
-                println!("Checking ID: {}", checking_id);
-                println!("--------------------------");
-
-                if comparar_numeros(&elementos_texto, &numbers) {
-                    println!("Aposta Vencedora! Efetuando pagamento...");
-
-                    // Efetua o pagamento para a carteira vencedora
-                    match efetuar_pagamento(&wallet, 100).await {
-                        Ok(_) => println!("Pagamento efetuado com sucesso para a carteira: {}", wallet),
-                        Err(e) => eprintln!("Erro ao efetuar pagamento: {}", e),
-                    }
-                } else {
-                    println!("Aposta não premiada.");
-                }
-            }
+            println!("Concurso: {}, Números: {}", contest, numbers);
 
             sleep(Duration::from_secs(10)).await;
         }
@@ -122,23 +70,55 @@ pub async fn executar() -> Result<(), Box<dyn Error>> {
         driver.quit().await?;
         let _ = geckodriver.kill();
 
-        Ok::<(), Box<dyn Error>>(())
-    }.await;
+        Ok::<(), Box<dyn std::error::Error>>(())
+    }
+        .await;
+
     match result {
         Ok(_) => {
             println!("[CRAWLER] --- DINAMICO --- EXECUTADO COM SUCESSO!");
             Ok(())
         }
         Err(e) => {
-            eprintln!("[CRAWLER] --- DINAMICO --- EXECUTADO COM Erro: {}", e);
+            eprintln!("[CRAWLER] --- DINAMICO --- EXECUTADO COM ERRO: {}", e);
             Ok(())
         }
     }
 }
 
-async fn efetuar_pagamento(wallet: &str, amount: i64) -> Result<(), Box<dyn Error>> {
-    let client = Client::new();
+async fn establish_pg_connection() -> Result<(Client, Connection<Socket, postgres_native_tls::TlsStream<Socket>>), Error> {
 
+    // Configurando o conector TLS
+    let tls_connector = TlsConnector::builder()
+        .build()
+        .expect("Falha ao construir TlsConnector.");
+    let tls = MakeTlsConnector::new(tls_connector);
+
+    // Configurando os parâmetros de conexão
+    let mut config = Config::new();
+    config.host("dpg-csfce008fa8c739toahg-a.oregon-postgres.render.com");
+    config.port(5432);
+    config.user("lotouser");
+    config.password("msvW0N3SdsLh12rbJRcONRTYWTBTqIHY");
+    config.dbname("loto");
+    config.ssl_mode(tokio_postgres::config::SslMode::Require); // Força uso de SSL/TLS
+
+    // Estabelecendo a conexão
+    let (client, connection) = config.connect(tls).await?;
+    Ok((client, connection))
+}
+
+fn extract_text(fragment: &Html, selector_str: &str) -> String {
+    let selector = Selector::parse(selector_str).unwrap();
+    fragment
+        .select(&selector)
+        .next()
+        .map(|element| element.inner_html())
+        .unwrap_or_default()
+}
+
+async fn efetuar_pagamento(wallet: &str, amount: i64) -> Result<(), Box<dyn std::error::Error>> {
+    let client = HttpClient::new();
     let params = serde_json::json!({
         "out": true,
         "amount": amount,
@@ -153,7 +133,6 @@ async fn efetuar_pagamento(wallet: &str, amount: i64) -> Result<(), Box<dyn Erro
         .send()
         .await?;
 
-    // Captura o status antes de consumir o corpo da resposta
     let status = response.status();
     let body = response.text().await.unwrap_or_else(|_| "Erro desconhecido".to_string());
 

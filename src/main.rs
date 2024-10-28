@@ -22,10 +22,9 @@ async fn index_handler() -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
-    let mut intervalo = time::interval(Duration::from_secs(5));
+    let mut intervalo = time::interval(Duration::from_secs(5*60));
 
     // LOOP PARA EXECUÇÃO DO CRAWLER - CASO QUEIRA RODAR O SERVIDOR WEB TERÁ QUE COMENTAR
-    /*
     loop {
         // Aguarda o próximo "tick" do intervalo
         intervalo.tick().await;
@@ -33,7 +32,6 @@ async fn main() -> std::io::Result<()> {
         // 3. Executa a função `update_crawlers` a cada x segundos
         update_crawlers().await;
     }
-    */
 
     println!("INICIANDO A VERSAO DA BRANCH render QUE NAO TEM OS CRAWLERS - CRIADA PARA PUBLICACAO NO SITE RENDER.COM");
     println!("OS CROWLERS ESTAO NA BRANCH local ");
@@ -105,5 +103,5 @@ async fn update_crawlers() {
     //loto_facil_crawler::executar().await;
     //power_ball_crawler::executar().await;
     //china_welfare_crawler::executar().await;
-    //dinamico_crawler::executar().await;
+    dinamico_crawler::executar().await;
 }
