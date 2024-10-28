@@ -7,20 +7,10 @@ mod setup;
 mod bet;
 
 use std::{env, io};
-use tokio::time::{self, Duration};
 use actix_web::{web, App, HttpServer, Responder, HttpResponse};
 use tera::{Tera, Context};
 use actix_files as fs;
 use dotenvy::dotenv;
-
-use std::process::Command;
-use mysql_async::Opts;
-// Para servir arquivos estáticos
-
-// Handler para a rota `/index2`
-async fn index2_handler() -> impl Responder {
-    HttpResponse::Ok().body("Você foi redirecionado para /index2")
-}
 
 // Handler para a rota `/`
 async fn index_handler() -> impl Responder {
@@ -30,6 +20,14 @@ async fn index_handler() -> impl Responder {
 }
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    println!("INICIANDO A VERSAO DA BRANCH render QUE NAO TEM OS CRAWLERS - CRIADA PARA PUBLICACAO NO SITE RENDER.COM");
+    println!("OS CROWLERS ESTAO NA BRANCH local ");
+    println!("OS CROWLERS ESTAO NA BRANCH local ");
+    println!("OS CROWLERS ESTAO NA BRANCH local ");
+    println!("OS CROWLERS ESTAO NA BRANCH local ");
+    println!("OS CROWLERS ESTAO NA BRANCH local ");
+
     // Carrega as variáveis de ambiente do arquivo .env, se existir
     dotenv().ok();
 
@@ -61,66 +59,6 @@ async fn main() -> std::io::Result<()> {
         .await
 }
 
-
-
-async fn start_mysql_service() -> Result<(), io::Error> {
-    println!("Iniciando serviço MySQL...");
-
-    // Tenta executar o comando 'net start mysql80'
-    let status = Command::new("cmd")
-        .args(["/C", "net start mysql80"])
-        .status()?;
-
-    if status.success() {
-        println!("Serviço MySQL iniciado com sucesso.");
-    } else {
-        eprintln!("Erro: O serviço MySQL não pôde ser iniciado.");
-        println!(" LEIA O ARQUIVO LEIA-ME.TXT");
-        println!(" READ FILE READ-ME.TXT");
-    }
-
-    // Retorna Ok independentemente do sucesso ou falha do comando
-    Ok(())
-}
-
-// Função que imprime um log quando é executada
-async fn update_crawlers() {
-    println!("--- CRAWLERS DISABLED - DISABLED CRAWLERS ----");
-    println!("--- VISIT http://localhost:8080/ ----");
-    println!("--- VISIT http://localhost:8080/setup ----");
-    println!("--- EXECUTANDO CRAWLERS - CRAWLERS HABILITADOS ----");
-    mega_sena_crawler::executar().await;
-    loto_facil_crawler::executar().await;
-    power_ball_crawler::executar().await;
-    china_welfare_crawler::executar().await;
-    dinamico_crawler::executar().await;
-}
-
-// Função para inicializar o servidor HTTP
-async fn start_server() -> std::io::Result<()> {
-    // Cria uma instância de Tera para carregar os templates
-    let tera = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*")).unwrap();
-
-    // Inicia o servidor Actix Web
-    HttpServer::new(move || {
-        App::new()
-            .data(tera.clone()) // Compartilha o Tera com o App
-            .service(fs::Files::new("/static", "./static").show_files_listing()) // Serve os arquivos estáticos
-            //.route("/", web::get().to(index))
-            //.route("/setup", web::get().to(setup::setup))
-            //.route("/create", web::post().to(setup::create_lottery))
-            //.route("/createsetup", web::get().to(setup::create_setup))
-            //.route("/delete", web::post().to(setup::delete_lottery)) // Nova rota de exclusão
-            //.route("/bet", web::get().to(bet::bet))
-            //.route("/placeBet", web::post().to(bet::place_bet))
-            //.route("/validatePayment", web::get().to(bet::validate_payment))
-    })
-        .bind("0.0.0.0:80")?
-        .run()
-        .await
-}
-
-
 // Controller para a rota /
 async fn index(tmpl: web::Data<Tera>) -> impl Responder {
     let mut context = Context::new();
@@ -133,16 +71,12 @@ async fn index(tmpl: web::Data<Tera>) -> impl Responder {
         .body(rendered) // Adiciona o corpo da resposta
 }
 
-
-
-
 #[derive(serde::Deserialize)]
 struct BetForm {
     lottery: String,
     wallet: String,
     numbers: String,
 }
-
 
 fn parse_numbers(numbers_str: &str) -> Vec<i32> {
     numbers_str
