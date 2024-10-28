@@ -52,6 +52,7 @@ async fn main() -> std::io::Result<()> {
             .route("/createsetup", web::get().to(setup::create_setup))
             .route("/create", web::post().to(setup::create_lottery))
             .route("/delete", web::post().to(setup::delete_lottery))
+            .route("/bet", web::get().to(bet::bet))
     })
         .bind(address)?
         .run()
