@@ -257,3 +257,10 @@ form input {
     border: 1px solid #ccc;
 }
 
+.quebralinha {
+    display: flex;
+    flex-wrap: wrap; /* Permite que os links caiam para a próxima linha */
+    gap: 10px; /* Espaçamento entre os links */
+    justify-content: space-around; /* Opcional: distribui os links de forma equilibrada */
+    margin-bottom: 20px;
+}
