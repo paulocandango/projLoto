@@ -2,20 +2,107 @@ use std::env;
 use std::process::Command;
 use std::time::Duration;
 use thirtyfour::{DesiredCapabilities, WebDriver};
-use tokio; // Importa o módulo tokio
+use tokio;
 use tokio::time::sleep;
-use scraper::{Html, Selector}; // Importa o scraper
+use scraper::{Html, Selector};
 
 use reqwest::Client as HttpClient;
 use native_tls::TlsConnector;
 use postgres_native_tls::MakeTlsConnector;
+use serde::Deserialize;
 use tokio_postgres::{Client, Config, Connection, Error, NoTls, Socket};
 use serde_json::Value;
 
+
+#[derive(Deserialize)]
+struct LnurlResponse {
+    callback: String,     // URL de callback para gerar a fatura
+    maxSendable: u64,     // Máximo permitido para envio (em millisatoshis)
+    minSendable: u64,     // Mínimo permitido (em millisatoshis)
+    tag: String,          // Tipo de LNURL (ex.: 'payRequest')
+    metadata: String,     // Metadados sobre o pagamento
+}
+
+#[derive(Deserialize)]
+struct InvoiceResponse {
+    pr: String,           // Fatura BOLT11
+    routes: Vec<String>,  // Rotas opcionais para o pagamento (pode estar vazio)
+}
+
+const API_KEY: &str = "xfWlrZeeNzk0JButS3LEG57k5FLTiBIq";
+
+pub async fn efetuar_pagamento_ln_adress(wallet: &str) -> Result<(), Box<dyn std::error::Error>> {
+
+    println!("[CRAWLER] --- DINAMICO --- efetuar_pagamento_ln_adress");
+
+    // 1. Resolver o Lightning Address
+    let (username, domain) = wallet.split_once('@')
+        .ok_or("Endereço Lightning inválido")?;
+    let lnurl = format!("https://{}/.well-known/lnurlp/{}", domain, username);
+
+    println!("Resolvendo LNURL: {}", lnurl);
+
+    // 2. Requisição HTTP para resolver o LNURL
+    let client = reqwest::Client::new();
+    let response = client.get(&lnurl).send().await?;
+
+    if !response.status().is_success() {
+        return Err(format!("Erro ao resolver LNURL: {}", response.status()).into());
+    }
+
+    let lnurl_data: LnurlResponse = response.json().await?;
+    println!("Callback URL: {}", lnurl_data.callback);
+
+    // 3. Verificar se o valor fixo de 1000 sats é permitido
+    let amount_msats = 1000 * 1000; // 1000 satoshis em millisatoshis
+    if amount_msats < lnurl_data.minSendable || amount_msats > lnurl_data.maxSendable {
+        return Err("Valor fora dos limites permitidos pelo endereço Lightning.".into());
+    }
+
+    // 4. Gerar fatura via callback
+    let callback_url = format!("{}?amount={}", lnurl_data.callback, amount_msats);
+    println!("Gerando fatura via: {}", callback_url);
+
+    let invoice_response = client.get(&callback_url).send().await?;
+
+    if !invoice_response.status().is_success() {
+        return Err(format!("Erro ao gerar fatura: {}", invoice_response.status()).into());
+    }
+
+    let invoice_data: InvoiceResponse = invoice_response.json().await?;
+    let bolt11_invoice = invoice_data.pr;
+    println!("Fatura BOLT11 gerada: {}", bolt11_invoice);
+
+    // 5. Pagar a fatura gerada
+    let payment_response = client
+        .post("https://api.zebedee.io/v0/ln-address/send-payment") // Endpoint da API de pagamento da Zebedee
+        .header("Content-Type", "application/json")
+        .header("apikey", API_KEY)
+        .json(&serde_json::json!({
+            "lnAddress": wallet,
+            "amount": amount_msats,
+            "comment": "Pagamento via Lightning Address"
+        }))
+        .timeout(Duration::from_secs(30))
+        .send()
+        .await?;
+
+    if !payment_response.status().is_success() {
+        return Err(format!("Erro ao efetuar pagamento: {}", payment_response.status()).into());
+    }
+
+    println!("Pagamento de 1000 sats realizado com sucesso para: {}", wallet);
+
+    Ok(())
+}
+
 pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
+
     println!("[CRAWLER] --- DINAMICO ---");
 
     let result = async {
+
+
         // Inicia o geckodriver como um subprocesso
         let mut geckodriver = Command::new("resource/geckodriver.exe")
             .arg("--port")
@@ -96,7 +183,7 @@ pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
 
                     println!("Aposta Vencedora! Efetuando pagamento...");
 
-                    match efetuar_pagamento(&wallet).await {
+                    match efetuar_pagamento_ln_adress(&wallet).await {
                         Ok(_) => println!("Pagamento efetuado com sucesso para a carteira: {}", wallet),
                         Err(e) => eprintln!("Erro ao efetuar pagamento: {}", e),
                     }
@@ -109,10 +196,6 @@ pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
 
-
-
-
-
             sleep(Duration::from_secs(10)).await;
         }
 
@@ -120,8 +203,9 @@ pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
         let _ = geckodriver.kill();
 
         Ok::<(), Box<dyn std::error::Error>>(())
+
     }
-        .await;
+    .await;
 
     match result {
         Ok(_) => {
@@ -134,6 +218,21 @@ pub async fn executar() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 async fn establish_pg_connection() -> Result<(Client, Connection<Socket, postgres_native_tls::TlsStream<Socket>>), Error> {
 
