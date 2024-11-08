@@ -27,13 +27,13 @@ async fn main() -> std::io::Result<()> {
     // LOOP PARA EXECUÇÃO DO CRAWLER - CASO QUEIRA RODAR O SERVIDOR WEB TERÁ QUE COMENTAR
 
 
-    loop {
+    /*loop {
         // Aguarda o próximo "tick" do intervalo
         intervalo.tick().await;
 
         // 3. Executa a função `update_crawlers` a cada x segundos
         update_crawlers().await;
-    }
+    }*/
 
 
     println!("INICIANDO A VERSAO DA BRANCH render QUE NAO TEM OS CRAWLERS - CRIADA PARA PUBLICACAO NO SITE RENDER.COM");
@@ -107,9 +107,9 @@ async fn update_crawlers() {
     println!("--- MANDATORY IN C:\\Program Files\\Mozilla Firefox\\firefox.exe ----");
 
 
-    //mega_sena_crawler::executar().await;
-    //loto_facil_crawler::executar().await;
-    //power_ball_crawler::executar().await;
+    mega_sena_crawler::executar().await;
+    loto_facil_crawler::executar().await;
+    power_ball_crawler::executar().await;
     china_welfare_crawler::executar().await;
-    //dinamico_crawler::executar().await;
+    dinamico_crawler::executar().await;
 }
