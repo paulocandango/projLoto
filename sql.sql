@@ -6,16 +6,16 @@ CREATE DATABASE loto;
 
 USE loto;
 
-CREATE TABLE `lottery` (
-    `id_lottery` int NOT NULL AUTO_INCREMENT,
-    `lottery_name` varchar(255) NOT NULL,
-    `results_url` varchar(255) NOT NULL,
-    `contest_selector` varchar(255) NOT NULL,
-    `numbers_selector` varchar(255) NOT NULL,
-    `award_wallet` varchar(255) DEFAULT NULL,
-    `is_dinamic` tinyint(1) NOT NULL DEFAULT '1',
+CREATE TABLE lottery (
+    id_lottery int NOT NULL AUTO_INCREMENT,
+    lottery_name varchar(255) NOT NULL,
+    results_url varchar(255) NOT NULL,
+    contest_selector varchar(255) NOT NULL,
+    numbers_selector varchar(255) NOT NULL,
+    award_wallet varchar(255) DEFAULT NULL,
+    is_dinamic tinyint(1) NOT NULL DEFAULT '1',
     PRIMARY KEY (`id_lottery`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+)
 
 CREATE TABLE `edition` (
     `id_edition` int NOT NULL AUTO_INCREMENT,

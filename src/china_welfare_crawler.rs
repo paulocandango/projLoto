@@ -29,7 +29,7 @@ pub async fn executar() {
         let driver = WebDriver::new("http://127.0.0.1:4444", caps).await.unwrap();
 
         // Abre a página da Mega-Sena
-        driver.get("https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/").await.unwrap();
+        driver.get("http://www.cwl.gov.cn/ygkj/wqkjgg/ssq/").await.unwrap();
 
         // Espera um pouco para garantir que a página carregue completamente
         sleep(Duration::from_secs(10)).await; // Espera 10 segundos
